@@ -77,20 +77,6 @@ const mockdata = [
     ],
   },
   {
-    title: 'Auth',
-    links: [
-      { label: 'Sign In', icon: IconLogin2, link: PATH_AUTH.signin },
-      { label: 'Sign Up', icon: IconUserPlus, link: PATH_AUTH.signup },
-      {
-        label: 'Reset Password',
-        icon: IconRotateRectangle,
-        link: PATH_AUTH.passwordReset,
-      },
-      { label: 'Clerk', icon: IconUserShield, link: PATH_AUTH.clerk },
-      { label: 'Auth0', icon: IconBrandAuth0, link: PATH_AUTH.auth0 },
-    ],
-  },
-  {
     title: 'Pages',
     links: [
       { label: 'Pricing', icon: IconReceipt2, link: PATH_PAGES.pricing },

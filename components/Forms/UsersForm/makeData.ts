@@ -3,8 +3,7 @@ export type User = {
   firstName: string;
   lastName: string;
   email: string;
-  state: string[];
-  memberships: 'Cenadi' | 'Minesup' | 'Ipes';
+  state: string;
 };
 
 export const fakeData: User[] = [
