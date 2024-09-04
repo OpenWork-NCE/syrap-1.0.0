@@ -15,7 +15,6 @@ import {
 } from 'mantine-react-table';
 import {
   ActionIcon,
-  Box,
   Button,
   Flex,
   Stack,
@@ -24,12 +23,7 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { ModalsProvider, modals } from '@mantine/modals';
-import {
-  IconDownload,
-  IconEdit,
-  IconFileExport,
-  IconTrash,
-} from '@tabler/icons-react';
+import { IconEdit, IconTrash } from '@tabler/icons-react';
 import {
   QueryClient,
   QueryClientProvider,
@@ -37,30 +31,14 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import { fakeData } from './makeData';
-import { type Ues } from '@/types';
-import { jsPDF } from 'jspdf'; //or use your library of choice here
-import autoTable from 'jspdf-autotable';
+import { type User, fakeData, usStates } from './makeData';
 
 const Section = () => {
   const [validationErrors, setValidationErrors] = useState<
     Record<string, string | undefined>
   >({});
 
-  const handleExportRows = (rows: MRT_Row<Ues>[]) => {
-    const doc = new jsPDF();
-    const tableData = rows.map((row) => Object.values(row.original));
-    const tableHeaders = columns.map((c) => c.header);
-
-    autoTable(doc, {
-      head: [tableHeaders],
-      body: tableData,
-    });
-
-    doc.save('syrap-ues.pdf');
-  };
-
-  const columns = useMemo<MRT_ColumnDef<Ues>[]>(
+  const columns = useMemo<MRT_ColumnDef<User>[]>(
     () => [
       {
         accessorKey: 'id',
@@ -69,111 +47,83 @@ const Section = () => {
         size: 80,
       },
       {
-        accessorKey: 'ue_name',
-        header: 'UE',
+        accessorKey: 'firstName',
+        header: 'First Name',
         mantineEditTextInputProps: {
-          type: 'text',
+          type: 'email',
           required: true,
-          error: validationErrors?.ue_name,
+          error: validationErrors?.firstName,
           //remove any previous validation errors when user focuses on the input
           onFocus: () =>
             setValidationErrors({
               ...validationErrors,
-              ue_name: undefined,
+              firstName: undefined,
             }),
           //optionally add validation checking for onBlur or onChange
         },
       },
       {
-        accessorKey: 'slug',
-        header: 'Intitulé',
+        accessorKey: 'lastName',
+        header: 'Last Name',
         mantineEditTextInputProps: {
-          type: 'text',
+          type: 'email',
           required: true,
-          error: validationErrors?.slug,
+          error: validationErrors?.lastName,
           //remove any previous validation errors when user focuses on the input
           onFocus: () =>
             setValidationErrors({
               ...validationErrors,
-              slug: undefined,
+              lastName: undefined,
             }),
         },
       },
       {
-        accessorKey: 'description',
-        header: 'Description',
+        accessorKey: 'email',
+        header: 'Email',
         mantineEditTextInputProps: {
-          type: 'text',
+          type: 'email',
           required: true,
-          error: validationErrors?.description,
+          error: validationErrors?.email,
           //remove any previous validation errors when user focuses on the input
           onFocus: () =>
             setValidationErrors({
               ...validationErrors,
-              description: undefined,
+              email: undefined,
             }),
         },
       },
       {
-        accessorKey: 'nbr_hours',
-        header: 'Nombre Heures',
-        mantineEditTextInputProps: {
-          type: 'text',
-          required: true,
-          error: validationErrors?.nbr_hours,
-          //remove any previous validation errors when user focuses on the input
-          onFocus: () =>
-            setValidationErrors({
-              ...validationErrors,
-              nbr_hours: undefined,
-            }),
+        accessorKey: 'state',
+        header: 'State',
+        editVariant: 'select',
+        mantineEditSelectProps: {
+          data: usStates,
+          error: validationErrors?.state,
         },
       },
-      {
-        accessorKey: 'user_creator',
-        header: 'Utilisateur Createur',
-        mantineEditTextInputProps: {
-          type: 'text',
-          required: true,
-          error: validationErrors?.user_creator,
-          //remove any previous validation errors when user focuses on the input
-          onFocus: () =>
-            setValidationErrors({
-              ...validationErrors,
-              user_creator: undefined,
-            }),
-        },
-      },
-      // {
-      //   accessorKey: 'state',
-      //   header: 'State',
-      //   editVariant: 'select',
-      //   mantineEditSelectProps: {
-      //     data: usStates,
-      //     error: validationErrors?.state,
-      //   },
-      // },
     ],
     [validationErrors],
   );
 
   //call CREATE hook
-  const { mutateAsync: createUE, isPending: isCreatingUE } = useCreateUser();
+  const { mutateAsync: createUser, isPending: isCreatingUser } =
+    useCreateUser();
   //call READ hook
   const {
     data: fetchedUsers = [],
-    isError: isLoadingUEError,
-    isFetching: isFetchingUE,
-    isLoading: isLoadingUE,
+    isError: isLoadingUsersError,
+    isFetching: isFetchingUsers,
+    isLoading: isLoadingUsers,
   } = useGetUsers();
   //call UPDATE hook
-  const { mutateAsync: updateUE, isPending: isUpdatingUE } = useUpdateUser();
+  const { mutateAsync: updateUser, isPending: isUpdatingUser } =
+    useUpdateUser();
   //call DELETE hook
   const { mutateAsync: deleteUser, isPending: isDeletingUser } =
     useDeleteUser();
 
   //CREATE action
-  const handleCreateUser: MRT_TableOptions<Ues>['onCreatingRowSave'] = async ({
+  const handleCreateUser: MRT_TableOptions<User>['onCreatingRowSave'] = async ({
     values,
     exitCreatingMode,
   }) => {
@@ -183,12 +133,12 @@ const Section = () => {
       return;
     }
     setValidationErrors({});
-    await createUE(values);
+    await createUser(values);
     exitCreatingMode();
   };
 
   //UPDATE action
-  const handleSaveUser: MRT_TableOptions<Ues>['onEditingRowSave'] = async ({
+  const handleSaveUser: MRT_TableOptions<User>['onEditingRowSave'] = async ({
     values,
     table,
   }) => {
@@ -198,21 +148,21 @@ const Section = () => {
       return;
     }
     setValidationErrors({});
-    await updateUE(values);
+    await updateUser(values);
     table.setEditingRow(null); //exit editing mode
   };
 
   //DELETE action
-  const openDeleteConfirmModal = (row: MRT_Row<Ues>) =>
+  const openDeleteConfirmModal = (row: MRT_Row<User>) =>
     modals.openConfirmModal({
-      title: 'Etes vous sur de vouloir supprimer cette UE ?',
+      title: 'Are you sure you want to delete this user?',
       children: (
         <Text>
-          Etes vous sure de vouloir supprimer {row.original.ue_name}? Cette
-          action ne peut pas être defaite.
+          Are you sure you want to delete {row.original.firstName}{' '}
+          {row.original.lastName}? This action cannot be undone.
         </Text>
       ),
-      labels: { confirm: 'Supprimer', cancel: 'Annuler' },
+      labels: { confirm: 'Delete', cancel: 'Cancel' },
       confirmProps: { color: 'red' },
       onConfirm: () => deleteUser(row.original.id),
     });
@@ -223,16 +173,11 @@ const Section = () => {
     createDisplayMode: 'modal', //default ('row', and 'custom' are also available)
     editDisplayMode: 'modal', //default ('row', 'cell', 'table', and 'custom' are also available)
     enableEditing: true,
-    enableRowSelection: true,
-    positionToolbarAlertBanner: 'bottom',
-    // renderTopToolbarCustomActions: ({ table }) => (
-    //
-    // ),
     getRowId: (row) => row.id,
-    mantineToolbarAlertBannerProps: isLoadingUEError
+    mantineToolbarAlertBannerProps: isLoadingUsersError
       ? {
           color: 'red',
-          children: 'Erreur de chargement des données',
+          children: 'Error loading data',
         }
       : undefined,
     mantineTableContainerProps: {
@@ -277,58 +222,25 @@ const Section = () => {
       </Flex>
     ),
     renderTopToolbarCustomActions: ({ table }) => (
-      <Flex gap={4}>
-        <Button
-          onClick={() => {
-            table.setCreatingRow(true); //simplest way to open the create row modal with no default values
-            //or you can pass in a row object to set default values with the `createRow` helper function
-            // table.setCreatingRow(
-            //   createRow(table, {
-            //     //optionally pass in default values for the new row, useful for nested data or other complex scenarios
-            //   }),
-            // );
-          }}
-        >
-          Nouvelle UE
-        </Button>
-        <Button
-          disabled={table.getPrePaginationRowModel().rows.length === 0}
-          //export all rows, including from the next page, (still respects filtering and sorting)
-          onClick={() =>
-            handleExportRows(table.getPrePaginationRowModel().rows)
-          }
-          leftSection={<IconFileExport />}
-          variant="filled"
-        >
-          Exporter tout
-        </Button>
-        <Button
-          disabled={table.getRowModel().rows.length === 0}
-          //export all rows as seen on the screen (respects pagination, sorting, filtering, etc.)
-          onClick={() => handleExportRows(table.getRowModel().rows)}
-          leftSection={<IconFileExport />}
-          variant="filled"
-        >
-          Exporter Page
-        </Button>
-        <Button
-          disabled={
-            !table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()
-          }
-          //only export selected rows
-          onClick={() => handleExportRows(table.getSelectedRowModel().rows)}
-          leftSection={<IconFileExport />}
-          variant="filled"
-        >
-          Exporter Selection
-        </Button>
-      </Flex>
+      <Button
+        onClick={() => {
+          table.setCreatingRow(true); //simplest way to open the create row modal with no default values
+          //or you can pass in a row object to set default values with the `createRow` helper function
+          // table.setCreatingRow(
+          //   createRow(table, {
+          //     //optionally pass in default values for the new row, useful for nested data or other complex scenarios
+          //   }),
+          // );
+        }}
+      >
+        Nouvel Utilisateur
+      </Button>
     ),
     state: {
-      isLoading: isLoadingUE,
-      isSaving: isCreatingUE || isUpdatingUE || isDeletingUser,
-      showAlertBanner: isLoadingUEError,
-      showProgressBars: isFetchingUE,
+      isLoading: isLoadingUsers,
+      isSaving: isCreatingUser || isUpdatingUser || isDeletingUser,
+      showAlertBanner: isLoadingUsersError,
+      showProgressBars: isFetchingUsers,
     },
   });
 
@@ -339,13 +251,13 @@ const Section = () => {
 function useCreateUser() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (user: Ues) => {
+    mutationFn: async (user: User) => {
       //send api update request here
       await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
       return Promise.resolve();
     },
     //client side optimistic update
-    onMutate: (newUserInfo: Ues) => {
+    onMutate: (newUserInfo: User) => {
       queryClient.setQueryData(
         ['users'],
         (prevUsers: any) =>
@@ -355,7 +267,7 @@ function useCreateUser() {
               ...newUserInfo,
               id: (Math.random() + 1).toString(36).substring(7),
             },
-          ] as Ues[],
+          ] as User[],
       );
     },
     // onSettled: () => queryClient.invalidateQueries({ queryKey: ['users'] }), //refetch users after mutation, disabled for demo
@@ -364,7 +276,7 @@ function useCreateUser() {
 
 //READ hook (get users from api)
 function useGetUsers() {
-  return useQuery<Ues[]>({
+  return useQuery<User[]>({
     queryKey: ['users'],
     queryFn: async () => {
       //send api request here
@@ -379,17 +291,17 @@ function useGetUsers() {
 function useUpdateUser() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (user: Ues) => {
+    mutationFn: async (user: User) => {
       //send api update request here
       await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
       return Promise.resolve();
     },
     //client side optimistic update
-    onMutate: (newUserInfo: Ues) => {
+    onMutate: (newUserInfo: User) => {
       queryClient.setQueryData(
         ['users'],
         (prevUsers: any) =>
-          prevUsers?.map((prevUser: Ues) =>
+          prevUsers?.map((prevUser: User) =>
             prevUser.id === newUserInfo.id ? newUserInfo : prevUser,
           ),
       );
@@ -402,7 +314,7 @@ function useUpdateUser() {
 function useDeleteUser() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (ueId: string) => {
+    mutationFn: async (userId: string) => {
       //send api update request here
       await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
       return Promise.resolve();
@@ -412,7 +324,7 @@ function useDeleteUser() {
       queryClient.setQueryData(
         ['users'],
         (prevUsers: any) =>
-          prevUsers?.filter((user: Ues) => user.id !== userId),
+          prevUsers?.filter((user: User) => user.id !== userId),
       );
     },
     // onSettled: () => queryClient.invalidateQueries({ queryKey: ['users'] }), //refetch users after mutation, disabled for demo
@@ -421,7 +333,7 @@ function useDeleteUser() {
 
 const queryClient = new QueryClient();
 
-const UesTable = () => (
+const UsersForm = () => (
   //Put this with your other react-query providers near root of your app
   <QueryClientProvider client={queryClient}>
     <ModalsProvider>
@@ -430,10 +342,9 @@ const UesTable = () => (
   </QueryClientProvider>
 );
 
-export default UesTable;
+export default UsersForm;
 
 const validateRequired = (value: string) => !!value.length;
-const validateRequiredNumber = (value: number) => !!value;
 const validateEmail = (email: string) =>
   !!email.length &&
   email
@@ -442,13 +353,12 @@ const validateEmail = (email: string) =>
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
     );
 
-function validateUser(ues: Ues) {
+function validateUser(user: User) {
   return {
-    ue_name: !validateRequired(ues.ue_name)
-      ? "L'intitulé de l'UE est requis"
+    firstName: !validateRequired(user.firstName)
+      ? 'First Name is Required'
       : '',
-    nbr_hours: !validateRequiredNumber(ues.nbr_hours)
-      ? "Le nombre d'heures est requis : "
-      : '',
+    lastName: !validateRequired(user.lastName) ? 'Last Name is Required' : '',
+    email: !validateEmail(user.email) ? 'Incorrect Email Format' : '',
   };
 }

@@ -11,9 +11,7 @@ import {
   Text,
 } from '@mantine/core';
 import { PATH_BOARD } from '@/routes';
-import { InvoicesTable, PageHeader, UesTable } from '@/components';
-import { IconDotsVertical } from '@tabler/icons-react';
-import { useFetchData } from '@/hooks';
+import { PageHeader, UesTable } from '@/components';
 
 const items = [
   { title: 'Cenadi', href: PATH_BOARD.cenadi },
@@ -31,11 +29,11 @@ const PAPER_PROPS: PaperProps = {
 };
 
 function Page() {
-  const {
-    data: uesData,
-    loading: uesLoading,
-    error: uesError,
-  } = useFetchData('/mocks/Ues.json');
+  // const {
+  //   data: uesData,
+  //   loading: uesLoading,
+  //   error: uesError,
+  // } = useFetchData('/mocks/Ues.json');
 
   return (
     <>
@@ -45,18 +43,9 @@ function Page() {
       </>
       <Container fluid>
         <Stack gap="lg">
-          <PageHeader
-            title="Unitées d'Enseignement"
-            breadcrumbItems={items}
-            uesAction={true}
-          />
+          <PageHeader title="Unitées d'Enseignement" breadcrumbItems={items} />
           <Paper {...PAPER_PROPS}>
-            <Group justify="space-between" mb="md">
-              <ActionIcon>
-                <IconDotsVertical size={18} />
-              </ActionIcon>
-            </Group>
-            <UesTable data={uesData} error={uesError} loading={uesLoading} />
+            <UesTable />
           </Paper>
         </Stack>
       </Container>

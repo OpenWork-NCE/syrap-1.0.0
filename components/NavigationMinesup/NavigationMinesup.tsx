@@ -1,37 +1,21 @@
 import { ActionIcon, Box, Flex, Group, ScrollArea, Text } from '@mantine/core';
 import {
-  IconBook2,
-  IconBrandAuth0,
-  IconBriefcase,
-  IconCalendar,
-  IconChartArcs3,
+  IconChartArea,
   IconChartBar,
-  IconChartInfographic,
-  IconExclamationCircle,
-  IconFileInvoice,
-  IconLayersSubtract,
-  IconLifebuoy,
-  IconList,
-  IconListDetails,
-  IconLogin2,
-  IconMessages,
-  IconReceipt2,
-  IconRotateRectangle,
-  IconUserCircle,
-  IconUserCode,
-  IconUserPlus,
-  IconUserShield,
+  IconCross,
+  IconFileDownload,
+  IconFileUpload,
+  IconFolders,
+  IconFolderShare,
+  IconGitCompare,
+  IconNotebook,
+  IconSchool,
+  IconUsers,
+  IconUsersGroup,
   IconX,
 } from '@tabler/icons-react';
 import { Logo, UserProfileButton } from '@/components';
-import {
-  PATH_ABOUT,
-  PATH_APPS,
-  PATH_AUTH,
-  PATH_DASHBOARD,
-  PATH_DOCS,
-  PATH_PAGES,
-} from '@/routes';
+import { PATH_APPS, PATH_SECTIONS, PATH_BOARD } from '@/routes';
 import UserProfileData from '@/public/mocks/UserProfile.json';
 import { useMediaQuery } from '@mantine/hooks';
 import classes from './Navigation.module.css';
@@ -39,83 +23,51 @@ import { LinksGroup } from '@/components/Navigation/Links/Links';
 
 const mockdata = [
   {
-    title: 'Dashboard',
+    title: 'Infos Metiers',
     links: [
-      { label: 'Default', icon: IconChartBar, link: PATH_DASHBOARD.default },
+      { label: 'Accueil', icon: IconChartBar, link: PATH_BOARD.minesup },
+      { label: 'UEs', icon: IconFolders, link: PATH_SECTIONS.ues },
       {
-        label: 'Analytics',
-        icon: IconChartInfographic,
-        link: PATH_DASHBOARD.analytics,
+        label: 'Universités',
+        icon: IconSchool,
+        link: PATH_SECTIONS.universities,
       },
-      { label: 'SaaS', icon: IconChartArcs3, link: PATH_DASHBOARD.saas },
+      {
+        label: 'Croiser et Comparer',
+        icon: IconGitCompare,
+        link: PATH_SECTIONS.crosscompare,
+      },
+      { label: 'IPES', icon: IconNotebook, link: PATH_SECTIONS.ipes },
     ],
   },
   {
-    title: 'Apps',
+    title: 'Documents',
     links: [
-      { label: 'Profile', icon: IconUserCircle, link: PATH_APPS.profile },
-      { label: 'Settings', icon: IconUserCode, link: PATH_APPS.settings },
-      { label: 'Chat', icon: IconMessages, link: PATH_APPS.chat },
-      { label: 'Projects', icon: IconBriefcase, link: PATH_APPS.projects },
-      { label: 'Orders', icon: IconListDetails, link: PATH_APPS.orders },
       {
-        label: 'Invoices',
-        icon: IconFileInvoice,
-        links: [
-          {
-            label: 'List',
-            link: PATH_APPS.invoices.all,
-          },
-          {
-            label: 'Details',
-            link: PATH_APPS.invoices.sample,
-          },
-        ],
+        label: 'Téléchargements',
+        icon: IconFileDownload,
+        link: PATH_SECTIONS.downloads,
       },
-      { label: 'Tasks', icon: IconListDetails, link: PATH_APPS.tasks },
-      { label: 'Calendar', icon: IconCalendar, link: PATH_APPS.calendar },
+      {
+        label: 'Téléversements',
+        icon: IconFileUpload,
+        link: PATH_SECTIONS.uploads,
+      },
     ],
   },
   {
-    title: 'Auth',
-    links: [
-      { label: 'Sign In', icon: IconLogin2, link: PATH_AUTH.signin },
-      { label: 'Sign Up', icon: IconUserPlus, link: PATH_AUTH.signup },
-      {
-        label: 'Reset Password',
-        icon: IconRotateRectangle,
-        link: PATH_AUTH.passwordReset,
-      },
-      { label: 'Clerk', icon: IconUserShield, link: PATH_AUTH.clerk },
-      { label: 'Auth0', icon: IconBrandAuth0, link: PATH_AUTH.auth0 },
-    ],
-  },
-  {
-    title: 'Pages',
-    links: [
-      { label: 'Pricing', icon: IconReceipt2, link: PATH_PAGES.pricing },
-      { label: 'Blank Page', icon: IconLayersSubtract, link: PATH_PAGES.blank },
-    ],
-  },
-  {
-    title: 'Documentation',
+    title: 'Raports et Logs',
     links: [
       {
-        label: 'About',
-        icon: IconExclamationCircle,
-        link: PATH_ABOUT.root,
+        label: 'Rapports',
+        icon: IconFolderShare,
+        link: PATH_APPS.profile,
       },
       {
-        label: 'Getting started',
-        icon: IconLifebuoy,
-        link: PATH_DOCS.root,
+        label: 'Logs',
+        icon: IconChartArea,
+        link: PATH_APPS.settings,
       },
-      {
-        label: 'Documentation',
-        icon: IconBook2,
-        link: PATH_DOCS.root,
-      },
-      { label: 'Changelog', icon: IconList },
     ],
   },
 ];
@@ -124,14 +76,14 @@ type NavigationProps = {
   onClose: () => void;
 };
 
-const NavigationMinesup = ({ onClose }: NavigationProps) => {
+const NavigationCenadi = ({ onClose }: NavigationProps) => {
   const tablet_match = useMediaQuery('(max-width: 768px)');
 
   const links = mockdata.map((m) => (
     <Box pl={0} mb="md" key={m.title}>
       <Text
         tt="uppercase"
-        size="xs"
+        size="sm"
         pl="md"
         fw={500}
         mb="sm"
@@ -186,4 +138,4 @@ const NavigationMinesup = ({ onClose }: NavigationProps) => {
   );
 };
 
-export default NavigationMinesup;
+export default NavigationCenadi;

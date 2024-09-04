@@ -14,11 +14,22 @@ export const PATH_BOARD = {
 };
 
 const ROOTS_UES = '/ues/';
+const ROOTS_DOCUMENTS = '/documents';
+const ROOTS_USERS = '/users';
 const ROOT_SECTIONS = '/sections';
 
 export const PATH_SECTIONS = {
   root: ROOT_SECTIONS,
   ues: path(ROOT_SECTIONS, '/ues/list'),
+  users: path(ROOT_SECTIONS, '/users'),
+  authorizations: path(ROOT_SECTIONS, '/roles'),
+  universities: path(ROOT_SECTIONS, '/universities'),
+  crosscompare: path(ROOT_SECTIONS, '/crosscompare'),
+  ipes: path(ROOT_SECTIONS, '/ipes'),
+  downloads: path(ROOT_SECTIONS, '/documents/downloads'),
+  uploads: path(ROOT_SECTIONS, '/documents/uploads'),
+  reports: path(ROOT_SECTIONS, '/reports'),
+  logs: path(ROOT_SECTIONS, '/logs'),
 };
 
 const ROOT_APPS = '/apps';
@@ -74,6 +85,14 @@ export const PATH_UES = {
     all: path(ROOTS_INVOICES, '/list'),
     sample: path(ROOTS_INVOICES, `/details/`),
     ue_details: (id: string): string => path(ROOTS_INVOICES, `/details/${id}`),
+  },
+};
+
+export const PATH_DOCUMENTS = {
+  root: ROOTS_DOCUMENTS,
+  documents: {
+    uploads: path(ROOTS_INVOICES, '/uploads'),
+    downloads: path(ROOTS_INVOICES, `/downloads`),
   },
 };
 

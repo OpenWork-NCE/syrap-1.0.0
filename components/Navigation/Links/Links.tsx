@@ -66,7 +66,13 @@ export function LinksGroup(props: LinksGroupProps) {
         data-active={opened || undefined}
       >
         <Group justify="space-between" gap={0}>
-          <Box style={{ display: 'flex', alignItems: 'center' }}>
+          <Box
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              padding: '4px 32px',
+            }}
+          >
             <Icon size={18} />
             <Box ml="md">{label}</Box>
           </Box>

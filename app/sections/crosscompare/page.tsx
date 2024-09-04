@@ -11,13 +11,13 @@ import {
   Text,
 } from '@mantine/core';
 import { PATH_BOARD, PATH_DASHBOARD } from '@/routes';
-import { IpesTable, PageHeader, UniversitiesTable } from '@/components';
+import { PageHeader, UniversitiesTable } from '@/components';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { useFetchData } from '@/hooks';
 
 const items = [
   { title: 'Cenadi', href: PATH_BOARD.cenadi },
-  { title: 'Ipes', href: '#' },
+  { title: 'CrossCompare', href: '#' },
 ].map((item, index) => (
   <Anchor href={item.href} key={index}>
     {item.title}
@@ -40,18 +40,20 @@ function Page() {
   return (
     <>
       <>
-        <title>IPES | SYRAP</title>
+        <title>Croiser et Comparer les programmes | SYRAP</title>
         <meta name="description" content="" />
       </>
       <Container fluid>
         <Stack gap="lg">
-          <PageHeader title="IPES" breadcrumbItems={items} />
+          <PageHeader
+            title="Croiser et Comparer les programmes"
+            breadcrumbItems={items}
+          />
           <Paper {...PAPER_PROPS}>
             <Group justify="space-between" mb="md">
               <ActionIcon>
                 <IconDotsVertical size={18} />
               </ActionIcon>
-              <IpesTable />
             </Group>
           </Paper>
         </Stack>

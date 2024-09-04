@@ -34,6 +34,12 @@ import Surface from '@/components/Surface';
 import TextEditor from '@/components/TextEditor';
 import UserButton from '@/components/UserButton';
 import ErrorAlert from '@/components/ErrorAlert';
+import UsersForm from '@/components/Forms/UsersForm/UsersForm';
+
+import UniversitiesTable from '@/components/UniversitiesTable/UniversitiesTable';
+import IpesTable from '@/components/IpesTable/IpesTable';
+import UsersTable from '@/components/UsersTable/UsersTable';
+import UploadsTable from '@/components/UploadsTable/UploadsTable';
 
 export {
   Logo,
@@ -72,4 +78,9 @@ export {
   TextEditor,
   UserButton,
   ErrorAlert,
+  UsersForm,
+  UniversitiesTable,
+  IpesTable,
+  UsersTable,
+  UploadsTable,
 };

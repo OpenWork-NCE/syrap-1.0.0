@@ -27,13 +27,17 @@ const mockdata = [
     links: [
       { label: 'Accueil', icon: IconChartBar, link: PATH_BOARD.cenadi },
       { label: 'UEs', icon: IconFolders, link: PATH_SECTIONS.ues },
-      { label: 'Universités', icon: IconSchool, link: PATH_BOARD.cenadi },
+      {
+        label: 'Universités',
+        icon: IconSchool,
+        link: PATH_SECTIONS.universities,
+      },
       {
         label: 'Croiser et Comparer',
         icon: IconGitCompare,
-        link: PATH_BOARD.cenadi,
+        link: PATH_SECTIONS.crosscompare,
       },
-      { label: 'IPES', icon: IconNotebook, link: PATH_BOARD.cenadi },
+      { label: 'IPES', icon: IconNotebook, link: PATH_SECTIONS.ipes },
     ],
   },
   {
@@ -42,12 +46,12 @@ const mockdata = [
       {
         label: 'Téléchargements',
         icon: IconFileDownload,
-        link: PATH_APPS.profile,
+        link: PATH_SECTIONS.downloads,
       },
       {
         label: 'Téléversements',
         icon: IconFileUpload,
-        link: PATH_APPS.settings,
+        link: PATH_SECTIONS.uploads,
       },
     ],
   },
@@ -57,12 +61,12 @@ const mockdata = [
       {
         label: 'Utilisateurs',
         icon: IconUsers,
-        link: PATH_APPS.profile,
+        link: PATH_SECTIONS.users,
       },
       {
         label: 'Habilitations',
         icon: IconUsersGroup,
-        link: PATH_APPS.settings,
+        link: PATH_SECTIONS.authorizations,
       },
     ],
   },
@@ -94,7 +98,7 @@ const NavigationCenadi = ({ onClose }: NavigationProps) => {
     <Box pl={0} mb="md" key={m.title}>
       <Text
         tt="uppercase"
-        size="md"
+        size="sm"
         pl="md"
         fw={500}
         mb="sm"
