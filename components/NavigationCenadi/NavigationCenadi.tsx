@@ -4,10 +4,12 @@ import {
   IconChartBar,
   IconCross,
   IconFileDownload,
+  IconFiles,
   IconFileUpload,
   IconFolders,
   IconFolderShare,
   IconGitCompare,
+  IconMatchstick,
   IconNotebook,
   IconSchool,
   IconUsers,
@@ -28,16 +30,54 @@ const mockdata = [
       { label: 'Accueil', icon: IconChartBar, link: PATH_BOARD.cenadi },
       { label: 'UEs', icon: IconFolders, link: PATH_SECTIONS.ues },
       {
-        label: 'Universités',
+        label: 'Universités de Tutelle',
         icon: IconSchool,
-        link: PATH_SECTIONS.universities,
+        // link: PATH_SECTIONS.universities,
+        links: [
+          {
+            label: 'Vue Générale',
+            icon: IconGitCompare,
+            link: PATH_SECTIONS.universities.all,
+          },
+          {
+            label: 'Programmes',
+            icon: IconFiles,
+            link: PATH_SECTIONS.universities.syllabus,
+          },
+          {
+            label: 'Documents',
+            icon: IconFileUpload,
+            link: PATH_SECTIONS.universities.documents,
+          },
+        ],
+      },
+      {
+        label: 'IPES',
+        icon: IconNotebook,
+        // link: PATH_SECTIONS.ipes,
+        links: [
+          {
+            label: 'Vue Générale',
+            icon: IconGitCompare,
+            link: PATH_SECTIONS.ipes,
+          },
+          {
+            label: 'Programmes',
+            icon: IconFiles,
+            link: PATH_SECTIONS.ipes,
+          },
+          {
+            label: 'Matching Global',
+            icon: IconMatchstick,
+            link: PATH_SECTIONS.ipes,
+          },
+        ],
       },
       {
         label: 'Croiser et Comparer',
         icon: IconGitCompare,
         link: PATH_SECTIONS.crosscompare,
       },
-      { label: 'IPES', icon: IconNotebook, link: PATH_SECTIONS.ipes },
     ],
   },
   {
@@ -138,7 +178,7 @@ const NavigationCenadi = ({ onClose }: NavigationProps) => {
         </Flex>
       </div>
 
-      <ScrollArea className={classes.links}>
+      <ScrollArea className={classes.links} px={10}>
         <div className={classes.linksInner}>{links}</div>
       </ScrollArea>
 

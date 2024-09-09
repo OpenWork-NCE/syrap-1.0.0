@@ -27,10 +27,9 @@ import {
 } from '@mantine/core';
 import { ModalsProvider, modals } from '@mantine/modals';
 import {
-  IconDetails,
+  IconBook,
   IconDownload,
   IconEdit,
-  IconFileExport,
   IconFileTypeCsv,
   IconFileTypePdf,
   IconPlus,
@@ -41,14 +40,13 @@ import {
   QueryClient,
   QueryClientProvider,
   useMutation,
-  useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import { fakeData } from './makeData';
-import { type Ues } from '@/types';
+import { type Level } from '@/types';
 import { jsPDF } from 'jspdf'; //or use your library of choice here
 import autoTable from 'jspdf-autotable';
 import { mkConfig, generateCsv, download } from 'export-to-csv';
+import { masterInformaticsProgram } from './makeData';
 
 const csvConfig = mkConfig({
   fieldSeparator: ',',
@@ -56,12 +54,16 @@ const csvConfig = mkConfig({
   useKeysAsHeaders: true,
 });
 
-const Section = () => {
+type LevelTableProps = {
+  datas: Level[] | undefined;
+};
+
+const Section = ({ fakeData }: { fakeData: Level[] }) => {
   const [validationErrors, setValidationErrors] = useState<
     Record<string, string | undefined>
   >({});
 
-  const handleExportRows = (rows: MRT_Row<Ues>[]) => {
+  const handleExportRows = (rows: MRT_Row<Level>[]) => {
     const doc = new jsPDF();
     const tableData = rows.map((row) => Object.values(row.original));
     const tableHeaders = columns.map((c) => c.header);
@@ -71,10 +73,10 @@ const Section = () => {
       body: tableData,
     });
 
-    doc.save('syrap-ues.pdf');
+    doc.save('syrap-level.pdf');
   };
 
-  const handleExportRowsAsCSV = (rows: MRT_Row<Ues>[]) => {
+  const handleExportRowsAsCSV = (rows: MRT_Row<Level>[]) => {
     const rowData = rows.map((row) => row.original);
     const csv = generateCsv(csvConfig)(rowData);
     download(csvConfig)(csv);
@@ -85,170 +87,93 @@ const Section = () => {
     download(csvConfig)(csv);
   };
 
-  const columns = useMemo<MRT_ColumnDef<Ues>[]>(
+  const columns = useMemo<MRT_ColumnDef<Level>[]>(
     () => [
       {
         accessorKey: 'id',
-        header: 'N°',
+        header: 'Identifiant',
         enableEditing: false,
         size: 80,
       },
       {
-        accessorKey: 'ue_name',
-        header: 'UE',
+        accessorKey: 'name',
+        header: 'Niveau',
 
         mantineEditTextInputProps: {
           type: 'text',
           required: true,
-          error: validationErrors?.ue_name,
-          //remove any previous validation errors when user focuses on the input
+          error: validationErrors?.name,
+          //remove any previous validation errors when level focuses on the input
           onFocus: () =>
             setValidationErrors({
               ...validationErrors,
-              ue_name: undefined,
+              name: undefined,
             }),
           //optionally add validation checking for onBlur or onChange
         },
       },
-      {
-        accessorKey: 'slug',
-        header: 'Intitulé',
-        enableHiding: true,
-        mantineEditTextInputProps: {
-          type: 'text',
-          required: true,
-          error: validationErrors?.slug,
-          //remove any previous validation errors when user focuses on the input
-          onFocus: () =>
-            setValidationErrors({
-              ...validationErrors,
-              slug: undefined,
-            }),
-        },
-      },
-      {
-        accessorKey: 'description',
-        header: 'Description',
-        mantineEditTextInputProps: {
-          type: 'text',
-          required: true,
-          error: validationErrors?.description,
-          //remove any previous validation errors when user focuses on the input
-          onFocus: () =>
-            setValidationErrors({
-              ...validationErrors,
-              description: undefined,
-            }),
-        },
-      },
-      {
-        accessorKey: 'nbr_hours',
-        header: 'Nombre Heures',
-        mantineEditTextInputProps: {
-          type: 'text',
-          required: true,
-          error: validationErrors?.nbr_hours,
-          //remove any previous validation errors when user focuses on the input
-          onFocus: () =>
-            setValidationErrors({
-              ...validationErrors,
-              nbr_hours: undefined,
-            }),
-        },
-      },
-      {
-        accessorKey: 'user_creator',
-        header: 'Utilisateur Createur',
-        mantineEditTextInputProps: {
-          type: 'text',
-          required: true,
-          error: validationErrors?.user_creator,
-          //remove any previous validation errors when user focuses on the input
-          onFocus: () =>
-            setValidationErrors({
-              ...validationErrors,
-              user_creator: undefined,
-            }),
-        },
-      },
-      // {
-      //   accessorKey: 'state',
-      //   header: 'State',
-      //   editVariant: 'select',
-      //   mantineEditSelectProps: {
-      //     data: usStates,
-      //     error: validationErrors?.state,
-      //   },
-      // },
     ],
     [validationErrors],
   );
 
   //call CREATE hook
-  const { mutateAsync: createUE, isPending: isCreatingUE } = useCreateUser();
-  //call READ hook
-  const {
-    data: fetchedUsers = [],
-    isError: isLoadingUEError,
-    isFetching: isFetchingUE,
-    isLoading: isLoadingUE,
-  } = useGetUsers();
+  const { mutateAsync: createLevel, isPending: isCreatingLevel } =
+    useCreateLevel();
   //call UPDATE hook
-  const { mutateAsync: updateUE, isPending: isUpdatingUE } = useUpdateUser();
+  const { mutateAsync: updateLevel, isPending: isUpdatingLevel } =
+    useUpdateLevel();
   //call DELETE hook
-  const { mutateAsync: deleteUser, isPending: isDeletingUser } =
-    useDeleteUser();
+  const { mutateAsync: deleteLevel, isPending: isDeletingLevel } =
+    useDeleteLevel();
 
   //CREATE action
-  const handleCreateUser: MRT_TableOptions<Ues>['onCreatingRowSave'] = async ({
-    values,
-    exitCreatingMode,
-  }) => {
-    const newValidationErrors = validateUser(values);
-    if (Object.values(newValidationErrors).some((error) => error)) {
-      setValidationErrors(newValidationErrors);
-      return;
-    }
-    setValidationErrors({});
-    await createUE(values);
-    exitCreatingMode();
-  };
+  const handleCreateLevel: MRT_TableOptions<Level>['onCreatingRowSave'] =
+    async ({ values, exitCreatingMode }) => {
+      const newValidationErrors = validateLevel(values);
+      if (Object.values(newValidationErrors).some((error) => error)) {
+        setValidationErrors(newValidationErrors);
+        return;
+      }
+      setValidationErrors({});
+      await createLevel(values);
+      exitCreatingMode();
+    };
 
   //UPDATE action
-  const handleSaveUser: MRT_TableOptions<Ues>['onEditingRowSave'] = async ({
+  const handleSaveLevel: MRT_TableOptions<Level>['onEditingRowSave'] = async ({
     values,
     table,
   }) => {
-    const newValidationErrors = validateUser(values);
+    const newValidationErrors = validateLevel(values);
     if (Object.values(newValidationErrors).some((error) => error)) {
       setValidationErrors(newValidationErrors);
       return;
     }
     setValidationErrors({});
-    await updateUE(values);
+    await updateLevel(values);
     table.setEditingRow(null); //exit editing mode
   };
 
   //DELETE action
-  const openDeleteConfirmModal = (row: MRT_Row<Ues>) =>
+  const openDeleteConfirmModal = (row: MRT_Row<Level>) =>
     modals.openConfirmModal({
-      title: 'Etes vous sur de vouloir supprimer cette UE ?',
+      title: 'Etes vous sur de vouloir supprimer ce niveau ?',
       children: (
         <Text>
-          Etes vous sure de vouloir supprimer {row.original.ue_name}? Cette
-          action ne peut pas être defaite.
+          Etes vous sure de vouloir supprimer {row.original.name}? Cette action
+          est irreversible.
         </Text>
       ),
       labels: { confirm: 'Supprimer', cancel: 'Annuler' },
       confirmProps: { color: 'red' },
-      onConfirm: () => deleteUser(row.original.id),
+      onConfirm: () => deleteLevel(row.original.id),
     });
 
   const table = useMantineReactTable({
     columns,
-    data: fetchedUsers,
-    createDisplayMode: 'modal', //default ('row', and 'custom' are also available)
-    editDisplayMode: 'modal', //default ('row', 'cell', 'table', and 'custom' are also available)
+    data: fakeData,
+    createDisplayMode: 'row', //default ('row', and 'custom' are also available)
+    editDisplayMode: 'row', //default ('row', 'cell', 'table', and 'custom' are also available)
     enableEditing: true,
     enableRowSelection: true,
     positionToolbarAlertBanner: 'bottom',
@@ -268,46 +193,42 @@ const Section = () => {
       density: 'xs',
       columnVisibility: {
         id: false,
-        slug: false,
-        description: false,
-        nbr_hours: false,
-        user_creator: false,
       },
       columnPinning: {
         left: ['mrt-row-select'],
-        right: ['mrt-row-expand', 'mrt-row-actions'],
+        right: ['mrt-row-actions', 'mrt-row-expand'],
       },
       pagination: {
         pageIndex: 0,
-        pageSize: 20,
+        pageSize: 5,
       },
     },
 
     mantineSearchTextInputProps: {
-      placeholder: 'Rechercher des UEs',
+      placeholder: 'Rechercher un Niveau',
     },
     // renderTopToolbarCustomActions: ({ table }) => (
     //
     // ),
     getRowId: (row) => row.id,
-    mantineToolbarAlertBannerProps: isLoadingUEError
-      ? {
-          color: 'red',
-          children: 'Erreur de chargement des données',
-        }
-      : undefined,
+    // mantineToolbarAlertBannerProps: isLoadingLevelError
+    //   ? {
+    //       color: 'red',
+    //       children: 'Erreur de chargement des données',
+    //     }
+    //   : undefined,
     mantineTableContainerProps: {
       style: {
         minHeight: '500px',
       },
     },
     onCreatingRowCancel: () => setValidationErrors({}),
-    onCreatingRowSave: handleCreateUser,
+    onCreatingRowSave: handleCreateLevel,
     onEditingRowCancel: () => setValidationErrors({}),
-    onEditingRowSave: handleSaveUser,
+    onEditingRowSave: handleSaveLevel,
     renderCreateRowModalContent: ({ table, row, internalEditComponents }) => (
       <Stack>
-        <Title order={3}>Nouvel utilisateur</Title>
+        <Title order={3}>Nouveau Niveau de Filière</Title>
         {internalEditComponents}
         <Flex justify="flex-end" mt="xl">
           <MRT_EditActionButtons variant="text" table={table} row={row} />
@@ -316,35 +237,13 @@ const Section = () => {
     ),
     renderEditRowModalContent: ({ table, row, internalEditComponents }) => (
       <Stack>
-        <Title order={3}>Edit User</Title>
+        <Title order={3}>Editer le niveau</Title>
         {internalEditComponents}
         <Flex justify="flex-end" mt="xl">
           <MRT_EditActionButtons variant="text" table={table} row={row} />
         </Flex>
       </Stack>
     ),
-    // renderRowActionMenuItems: ({ row, table }) => (
-    //   <>
-    //     <Menu.Item
-    //       onClick={() => table.setEditingRow(row)}
-    //       leftSection={<IconDetails />}
-    //     >
-    //       Details
-    //     </Menu.Item>
-    //     <Menu.Item
-    //       onClick={() => table.setEditingRow(row)}
-    //       leftSection={<IconEdit />}
-    //     >
-    //       Editer
-    //     </Menu.Item>
-    //     <Menu.Item
-    //       onClick={() => openDeleteConfirmModal(row)}
-    //       leftSection={<IconTrash />}
-    //     >
-    //       Supprimer
-    //     </Menu.Item>
-    //   </>
-    // ),
 
     renderDetailPanel: ({ row }) => (
       <Box
@@ -354,10 +253,11 @@ const Section = () => {
           alignItems: 'center',
           gap: '16px',
           padding: '16px',
+          width: '100%',
         }}
       >
-        <Box style={{}}>
-          <Title order={5}>{row.original.ue_name}</Title>
+        <Box style={{ width: '100%' }}>
+          <Title order={5}>{row.original.name}</Title>
           <Divider pb={1} mb={10} />
           <Box style={{ fontSize: '16px' }}>
             <Text size={'sm'}>
@@ -365,29 +265,11 @@ const Section = () => {
               <span style={{ fontWeight: 'bolder' }}>{row.original.id}</span>
             </Text>
             <Text size={'sm'}>
-              Intitulé de l'UE :{' '}
-              <span style={{ fontWeight: 'bolder' }}>
-                {row.original.ue_name}
-              </span>
+              Intitulé du niveau :{' '}
+              <span style={{ fontWeight: 'bolder' }}>{row.original.name}</span>
             </Text>
-            <Text size={'sm'}>
-              Description :{' '}
-              <span style={{ fontWeight: 'bolder' }}>
-                {row.original.description}
-              </span>
-            </Text>
-            <Text size={'sm'}>
-              Nombre d'heures :{' '}
-              <span style={{ fontWeight: 'bolder' }}>
-                {row.original.nbr_hours}
-              </span>
-            </Text>
-            <Text size={'sm'}>
-              Créé par :{' '}
-              <span style={{ fontWeight: 'bolder' }}>
-                {row.original.user_creator}
-              </span>
-            </Text>
+            <Divider pb={1} mb={10} />
+            <Button leftSection={<IconBook />}>Aller aux programmes</Button>
           </Box>
         </Box>
       </Box>
@@ -428,7 +310,7 @@ const Section = () => {
             }}
             leftSection={<IconPlus />}
           >
-            Nouvelle UE
+            Nouveau Niveau
           </Button>
           <Menu
             shadow={'md'}
@@ -526,130 +408,106 @@ const Section = () => {
       </>
     ),
     state: {
-      isLoading: isLoadingUE,
-      isSaving: isCreatingUE || isUpdatingUE || isDeletingUser,
-      showAlertBanner: isLoadingUEError,
-      showProgressBars: isFetchingUE,
+      // isLoading: isLoadingLevel,
+      isSaving: isCreatingLevel || isUpdatingLevel || isDeletingLevel,
+      // showAlertBanner: isLoadingLevelError,
+      // showProgressBars: isFetchingLevel,
     },
   });
 
   return <MantineReactTable table={table} />;
 };
 
-//CREATE hook (post new user to api)
-function useCreateUser() {
+//CREATE hook (post new level to api)
+function useCreateLevel() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (user: Ues) => {
+    mutationFn: async (level: Level) => {
       //send api update request here
       await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
       return Promise.resolve();
     },
     //client side optimistic update
-    onMutate: (newUserInfo: Ues) => {
+    onMutate: (newLevelInfo: Level) => {
       queryClient.setQueryData(
-        ['users'],
-        (prevUsers: any) =>
+        ['levels'],
+        (prevLevels: any) =>
           [
-            ...prevUsers,
+            ...prevLevels,
             {
-              ...newUserInfo,
+              ...newLevelInfo,
               id: (Math.random() + 1).toString(36).substring(7),
             },
-          ] as Ues[],
+          ] as Level[],
       );
     },
-    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['users'] }), //refetch users after mutation, disabled for demo
+    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['levels'] }), //refetch levels after mutation, disabled for demo
   });
 }
 
-//READ hook (get users from api)
-function useGetUsers() {
-  return useQuery<Ues[]>({
-    queryKey: ['users'],
-    queryFn: async () => {
-      //send api request here
-      await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
-      return Promise.resolve(fakeData);
-    },
-    refetchOnWindowFocus: false,
-  });
-}
-
-//UPDATE hook (put user in api)
-function useUpdateUser() {
+//UPDATE hook (put level in api)
+function useUpdateLevel() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (user: Ues) => {
+    mutationFn: async (level: Level) => {
       //send api update request here
       await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
       return Promise.resolve();
     },
     //client side optimistic update
-    onMutate: (newUserInfo: Ues) => {
+    onMutate: (newLevelInfo: Level) => {
       queryClient.setQueryData(
-        ['users'],
-        (prevUsers: any) =>
-          prevUsers?.map((prevUser: Ues) =>
-            prevUser.id === newUserInfo.id ? newUserInfo : prevUser,
+        ['levels'],
+        (prevLevels: any) =>
+          prevLevels?.map((prevLevel: Level) =>
+            prevLevel.id === newLevelInfo.id ? newLevelInfo : prevLevel,
           ),
       );
     },
-    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['users'] }), //refetch users after mutation, disabled for demo
+    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['levels'] }), //refetch levels after mutation, disabled for demo
   });
 }
 
-//DELETE hook (delete user in api)
-function useDeleteUser() {
+//DELETE hook (delete level in api)
+function useDeleteLevel() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (ueId: string) => {
+    mutationFn: async (levelId: string) => {
       //send api update request here
       await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
       return Promise.resolve();
     },
     //client side optimistic update
-    onMutate: (userId: string) => {
+    onMutate: (levelId: string) => {
       queryClient.setQueryData(
-        ['users'],
-        (prevUsers: any) =>
-          prevUsers?.filter((user: Ues) => user.id !== userId),
+        ['levels'],
+        (prevLevels: any) =>
+          prevLevels?.filter((level: Level) => level.id !== levelId),
       );
     },
-    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['users'] }), //refetch users after mutation, disabled for demo
+    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['levels'] }), //refetch levels after mutation, disabled for demo
   });
 }
 
 const queryClient = new QueryClient();
 
-const UesTable = () => (
+const LevelTable = ({ datas }: LevelTableProps) => (
   //Put this with your other react-query providers near root of your app
   <QueryClientProvider client={queryClient}>
     <ModalsProvider>
-      <Section />
+      <Section fakeData={datas === undefined ? [] : datas} />
     </ModalsProvider>
   </QueryClientProvider>
 );
 
-export default UesTable;
+export default LevelTable;
 
 const validateRequired = (value: string) => !!value.length;
-const validateRequiredNumber = (value: number) => !!value;
-const validateEmail = (email: string) =>
-  !!email.length &&
-  email
-    .toLowerCase()
-    .match(
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-    );
 
-function validateUser(ues: Ues) {
+function validateLevel(level: Level) {
   return {
-    ue_name: !validateRequired(ues.ue_name)
-      ? "L'intitulé de l'UE est requis"
-      : '',
-    nbr_hours: !validateRequiredNumber(ues.nbr_hours)
-      ? "Le nombre d'heures est requis : "
+    name: !validateRequired(level.name)
+      ? "L'intitulé du niveau est requis"
       : '',
   };
 }

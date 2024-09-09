@@ -80,14 +80,30 @@ export type Document = {
   state: 'Actif' | 'Supprimé' | 'Archivé';
 };
 
+export type Level = {
+  id: string;
+  name: string;
+};
+
+export type Branch = {
+  id: string;
+  name: string;
+  levels: Level[];
+};
+
 export type University = {
   //These are Cameroonian and international universities that have representations in Cameroon
   id: string;
   name: string;
   phone: string;
   email: string;
-  borough: string; //Cameroon arrondissement
+  localization: string; //Cameroon arrondissement
   created_user: string; //Name of creator
+  ipes_count: number;
+  global_matching: number;
+  branch_count: number;
+  level_count: number;
+  branchs: Branch[];
 };
 
 export type Ipes = {
@@ -102,4 +118,5 @@ export type Ipes = {
   decret_of_creation: string;
   opening_stop: string;
   promoter: string; //Name of diregeant of Ipes
+  matching: number;
 };

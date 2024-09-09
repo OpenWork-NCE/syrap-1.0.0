@@ -4,10 +4,12 @@ import {
   IconChartBar,
   IconCross,
   IconFileDownload,
+  IconFiles,
   IconFileUpload,
   IconFolders,
   IconFolderShare,
   IconGitCompare,
+  IconMatchstick,
   IconNotebook,
   IconSchool,
   IconUsers,
@@ -27,16 +29,6 @@ const mockdata = [
     links: [
       { label: 'Accueil', icon: IconChartBar, link: PATH_BOARD.ipes },
       { label: 'UEs', icon: IconFolders, link: PATH_SECTIONS.ues },
-      {
-        label: 'Universités',
-        icon: IconSchool,
-        link: PATH_SECTIONS.universities,
-      },
-      {
-        label: 'Croiser et Comparer',
-        icon: IconGitCompare,
-        link: PATH_SECTIONS.crosscompare,
-      },
       {
         label: 'Université de Tutelle',
         icon: IconNotebook,
@@ -127,7 +119,7 @@ const NavigationCenadi = ({ onClose }: NavigationProps) => {
         </Flex>
       </div>
 
-      <ScrollArea className={classes.links}>
+      <ScrollArea className={classes.links} px={10}>
         <div className={classes.linksInner}>{links}</div>
       </ScrollArea>
 

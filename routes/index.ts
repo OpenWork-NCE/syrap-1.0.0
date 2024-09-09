@@ -17,13 +17,20 @@ const ROOTS_UES = '/ues/';
 const ROOTS_DOCUMENTS = '/documents';
 const ROOTS_USERS = '/users';
 const ROOT_SECTIONS = '/sections';
+const ROOTS_UNIVERSITIES = '/universities';
 
 export const PATH_SECTIONS = {
   root: ROOT_SECTIONS,
   ues: path(ROOT_SECTIONS, '/ues/list'),
   users: path(ROOT_SECTIONS, '/users'),
   authorizations: path(ROOT_SECTIONS, '/roles'),
-  universities: path(ROOT_SECTIONS, '/universities'),
+  universities: {
+    all: path(ROOT_SECTIONS, ROOTS_UNIVERSITIES + '/'),
+    syllabus: path(ROOT_SECTIONS, ROOTS_UNIVERSITIES + `/syllabus`),
+    documents: path(ROOT_SECTIONS, ROOTS_UNIVERSITIES + `/documents`),
+    university_details: (id: string): string =>
+      path(ROOT_SECTIONS, ROOTS_UNIVERSITIES + `/${id}`),
+  },
   crosscompare: path(ROOT_SECTIONS, '/crosscompare'),
   ipes: path(ROOT_SECTIONS, '/ipes'),
   downloads: path(ROOT_SECTIONS, '/documents/downloads'),
@@ -82,9 +89,18 @@ export const PATH_INVOICES = {
 export const PATH_UES = {
   root: ROOTS_UES,
   ues: {
-    all: path(ROOTS_INVOICES, '/list'),
+    all: path(ROOTS_UES, '/list'),
     sample: path(ROOTS_INVOICES, `/details/`),
     ue_details: (id: string): string => path(ROOTS_INVOICES, `/details/${id}`),
+  },
+};
+
+export const PATH_UNIVERSITIES = {
+  root: ROOTS_UNIVERSITIES,
+  universities: {
+    all: path(ROOTS_UNIVERSITIES, '/'),
+    syllabus: path(ROOTS_UNIVERSITIES, `/syllabus`),
+    documents: path(ROOTS_UNIVERSITIES, `/documents}`),
   },
 };
 

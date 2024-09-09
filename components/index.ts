@@ -40,6 +40,8 @@ import UniversitiesTable from '@/components/UniversitiesTable/UniversitiesTable'
 import IpesTable from '@/components/IpesTable/IpesTable';
 import UsersTable from '@/components/UsersTable/UsersTable';
 import UploadsTable from '@/components/UploadsTable/UploadsTable';
+import BranchTable from '@/components/BranchTable/BranchTable';
+import LevelTable from '@/components/LevelTable/LevelTable';
 
 export {
   Logo,
@@ -83,4 +85,6 @@ export {
   IpesTable,
   UsersTable,
   UploadsTable,
+  BranchTable,
+  LevelTable,
 };

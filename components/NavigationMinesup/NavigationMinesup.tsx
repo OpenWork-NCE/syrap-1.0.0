@@ -4,6 +4,7 @@ import {
   IconChartBar,
   IconCross,
   IconFileDownload,
+  IconFiles,
   IconFileUpload,
   IconFolders,
   IconFolderShare,
@@ -28,9 +29,26 @@ const mockdata = [
       { label: 'Accueil', icon: IconChartBar, link: PATH_BOARD.minesup },
       { label: 'UEs', icon: IconFolders, link: PATH_SECTIONS.ues },
       {
-        label: 'Universités',
+        label: 'Universités de Tutelle',
         icon: IconSchool,
-        link: PATH_SECTIONS.universities,
+        // link: PATH_SECTIONS.universities,
+        links: [
+          {
+            label: 'Vue Générale',
+            icon: IconGitCompare,
+            link: PATH_SECTIONS.universities.all,
+          },
+          {
+            label: 'Programmes',
+            icon: IconFiles,
+            link: PATH_SECTIONS.universities.syllabus,
+          },
+          {
+            label: 'Documents',
+            icon: IconFileUpload,
+            link: PATH_SECTIONS.universities.documents,
+          },
+        ],
       },
       {
         label: 'Croiser et Comparer',

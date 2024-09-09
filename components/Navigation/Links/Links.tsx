@@ -12,6 +12,7 @@ interface LinksGroupProps {
   link?: string;
   links?: {
     label: string;
+    icon?: any;
     link: string;
   }[];
   closeSidebar: () => void;
@@ -33,20 +34,33 @@ export function LinksGroup(props: LinksGroupProps) {
   const [currentPath, setCurrentPath] = useState<string | undefined>();
   const ChevronIcon = IconChevronRight;
 
-  const items = (hasLinks ? links : []).map((link) => (
-    <Text
-      component="button"
-      className={classes.link}
-      onClick={() => {
-        router.push(link.link);
-        closeSidebar();
-      }}
-      key={link.label}
-      data-active={link.link.toLowerCase() === pathname || undefined}
-    >
-      {link.label}
-    </Text>
-  ));
+  const items = (hasLinks ? links : []).map((linkItem) => {
+    const { label, icon: Icon, link } = linkItem;
+    return (
+      <UnstyledButton
+        component="button"
+        className={classes.link}
+        onClick={() => {
+          router.push(link);
+          closeSidebar();
+        }}
+        key={label}
+        data-active={link.toLowerCase() === pathname || undefined}
+        mb={2}
+      >
+        <Box
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            padding: '4px 32px',
+          }}
+        >
+          {/*<Icon size={18} />*/}
+          <Box ml="md">{label}</Box>
+        </Box>
+      </UnstyledButton>
+    );
+  });
 
   useEffect(() => {
     const paths = pathname.split('/');
