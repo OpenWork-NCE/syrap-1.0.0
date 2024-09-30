@@ -60,6 +60,18 @@ export type Ues = {
   user_creator: string;
 };
 
+export type Module = {
+  id: string;
+  name: string;
+  ues: Ues[];
+};
+
+export type Syllabus = {
+  id: string;
+  name: string;
+  modules: Module[];
+};
+
 export type User = {
   id: string;
   firstName: string;
@@ -67,11 +79,12 @@ export type User = {
   email: string;
   state: string;
   memberships: 'Cenadi' | 'Minesup' | 'Ipes';
+  profile: string;
 };
 
 export type Document = {
   id: string;
-  document_name: string;
+  document_name: File;
   document_description: string;
   document_type: string;
   document_size: number;
@@ -119,4 +132,13 @@ export type Ipes = {
   opening_stop: string;
   promoter: string; //Name of diregeant of Ipes
   matching: number;
+  branch_count: number;
+  level_count: number;
+  branchs: Branch[];
+};
+
+export type Authorization = {
+  id: string;
+  name: string;
+  rights: string;
 };

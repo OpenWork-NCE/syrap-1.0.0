@@ -15,6 +15,7 @@ import {
   IconUsers,
   IconUsersGroup,
   IconX,
+  IconFile,
 } from '@tabler/icons-react';
 import { Logo, UserProfileButton } from '@/components';
 import { PATH_APPS, PATH_SECTIONS, PATH_BOARD } from '@/routes';
@@ -35,7 +36,7 @@ const mockdata = [
         // link: PATH_SECTIONS.universities,
         links: [
           {
-            label: 'Vue Générale',
+            label: 'Vue Globale',
             icon: IconGitCompare,
             link: PATH_SECTIONS.universities.all,
           },
@@ -44,11 +45,11 @@ const mockdata = [
             icon: IconFiles,
             link: PATH_SECTIONS.universities.syllabus,
           },
-          {
-            label: 'Documents',
-            icon: IconFileUpload,
-            link: PATH_SECTIONS.universities.documents,
-          },
+          // {
+          //   label: 'Documents',
+          //   icon: IconFileUpload,
+          //   link: PATH_SECTIONS.universities.documents,
+          // },
         ],
       },
       {
@@ -57,20 +58,20 @@ const mockdata = [
         // link: PATH_SECTIONS.ipes,
         links: [
           {
-            label: 'Vue Générale',
+            label: 'Vue Globale',
             icon: IconGitCompare,
-            link: PATH_SECTIONS.ipes,
+            link: PATH_SECTIONS.ipes.all,
           },
           {
             label: 'Programmes',
             icon: IconFiles,
-            link: PATH_SECTIONS.ipes,
+            link: PATH_SECTIONS.ipes.syllabus,
           },
-          {
-            label: 'Matching Global',
-            icon: IconMatchstick,
-            link: PATH_SECTIONS.ipes,
-          },
+          // {
+          //   label: 'Documents',
+          //   icon: IconFileUpload,
+          //   link: PATH_SECTIONS.ipes.documents,
+          // },
         ],
       },
       {
@@ -84,14 +85,9 @@ const mockdata = [
     title: 'Documents',
     links: [
       {
-        label: 'Téléchargements',
-        icon: IconFileDownload,
-        link: PATH_SECTIONS.downloads,
-      },
-      {
-        label: 'Téléversements',
-        icon: IconFileUpload,
-        link: PATH_SECTIONS.uploads,
+        label: 'Tous les documents',
+        icon: IconFile,
+        link: PATH_SECTIONS.documents,
       },
     ],
   },

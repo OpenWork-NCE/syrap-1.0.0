@@ -11,9 +11,12 @@ import {
   Text,
 } from '@mantine/core';
 import { PATH_BOARD, PATH_DASHBOARD } from '@/routes';
-import { IpesTable, PageHeader, UniversitiesTable } from '@/components';
-import { IconDotsVertical } from '@tabler/icons-react';
-import { useFetchData } from '@/hooks';
+import {
+  AuthorizationsTable,
+  IpesTable,
+  PageHeader,
+  UniversitiesTable,
+} from '@/components';
 
 const items = [
   { title: 'Cenadi', href: PATH_BOARD.cenadi },
@@ -46,9 +49,7 @@ function Page() {
       <Container fluid>
         <Stack gap="lg">
           <PageHeader title="Habilitations" breadcrumbItems={items} />
-          <Paper {...PAPER_PROPS}>
-            <Group justify="space-between" mb="md"></Group>
-          </Paper>
+          <AuthorizationsTable />
         </Stack>
       </Container>
     </>

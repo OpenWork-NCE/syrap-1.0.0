@@ -3,6 +3,7 @@ import {
   IconChartArea,
   IconChartBar,
   IconCross,
+  IconFile,
   IconFileDownload,
   IconFiles,
   IconFileUpload,
@@ -34,7 +35,7 @@ const mockdata = [
         // link: PATH_SECTIONS.universities,
         links: [
           {
-            label: 'Vue Générale',
+            label: 'Vue Globale',
             icon: IconGitCompare,
             link: PATH_SECTIONS.universities.all,
           },
@@ -43,11 +44,11 @@ const mockdata = [
             icon: IconFiles,
             link: PATH_SECTIONS.universities.syllabus,
           },
-          {
-            label: 'Documents',
-            icon: IconFileUpload,
-            link: PATH_SECTIONS.universities.documents,
-          },
+          // {
+          //   label: 'Documents',
+          //   icon: IconFileUpload,
+          //   link: PATH_SECTIONS.universities.documents,
+          // },
         ],
       },
       {
@@ -55,21 +56,37 @@ const mockdata = [
         icon: IconGitCompare,
         link: PATH_SECTIONS.crosscompare,
       },
-      { label: 'IPES', icon: IconNotebook, link: PATH_SECTIONS.ipes },
+      {
+        label: 'IPES',
+        icon: IconNotebook,
+        // link: PATH_SECTIONS.ipes,
+        links: [
+          {
+            label: 'Vue Globale',
+            icon: IconGitCompare,
+            link: PATH_SECTIONS.ipes.all,
+          },
+          {
+            label: 'Programmes',
+            icon: IconFiles,
+            link: PATH_SECTIONS.ipes.syllabus,
+          },
+          // {
+          //   label: 'Documents',
+          //   icon: IconFileUpload,
+          //   link: PATH_SECTIONS.ipes.documents,
+          // },
+        ],
+      },
     ],
   },
   {
     title: 'Documents',
     links: [
       {
-        label: 'Téléchargements',
-        icon: IconFileDownload,
-        link: PATH_SECTIONS.downloads,
-      },
-      {
-        label: 'Téléversements',
-        icon: IconFileUpload,
-        link: PATH_SECTIONS.uploads,
+        label: 'Tous les documents',
+        icon: IconFile,
+        link: PATH_SECTIONS.documents,
       },
     ],
   },

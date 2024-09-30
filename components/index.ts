@@ -39,9 +39,18 @@ import UsersForm from '@/components/Forms/UsersForm/UsersForm';
 import UniversitiesTable from '@/components/UniversitiesTable/UniversitiesTable';
 import IpesTable from '@/components/IpesTable/IpesTable';
 import UsersTable from '@/components/UsersTable/UsersTable';
-import UploadsTable from '@/components/UploadsTable/UploadsTable';
 import BranchTable from '@/components/BranchTable/BranchTable';
 import LevelTable from '@/components/LevelTable/LevelTable';
+import SyllabusTable from '@/components/SyllabusTable/Syllabus';
+import SyllabusUTable from '@/components/SyllabusUTable/SyllabusU';
+import IpesStatsCard from '@/components/IpesStatsCard/IpesStatsCard';
+import IpesDetailsCard from '@/components/IpesDetailsCard/IpesDetailsCard';
+import SyllabusITable from '@/components/SyllabusITable/SyllabusI';
+import DocumentsTable from '@/components/DocumentsTable/DocumentsTable';
+import AuthorizationsTable from '@/components/AuthorizationsTable/AuthorizationsTable';
+import Syllabus from '@/components/SyllabusUTable/Syllabus';
+import BranchesUniversityTable from '@/components/UniversitiesTable/BranchTable/BranchTable';
+import LevelsUniversityTable from '@/components/UniversitiesTable/LevelTable/LevelTable';
 
 export {
   Logo,
@@ -84,7 +93,16 @@ export {
   UniversitiesTable,
   IpesTable,
   UsersTable,
-  UploadsTable,
   BranchTable,
   LevelTable,
+  SyllabusTable,
+  SyllabusUTable,
+  IpesStatsCard,
+  IpesDetailsCard,
+  SyllabusITable,
+  DocumentsTable,
+  AuthorizationsTable,
+  Syllabus,
+  BranchesUniversityTable,
+  LevelsUniversityTable,
 };

@@ -63,7 +63,7 @@ const FooterNav = () => {
         href={PATH_GITHUB.org}
         target="_blank"
       >
-        &copy;&nbsp;{new Date().getFullYear()}&nbsp;SYRAP
+        &copy;&nbsp;{new Date().getFullYear()}&nbsp;CENADI
       </Text>
     </Group>
   );

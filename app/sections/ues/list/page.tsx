@@ -4,6 +4,7 @@ import {
   ActionIcon,
   Anchor,
   Container,
+  Grid,
   Group,
   Paper,
   PaperProps,
@@ -11,7 +12,7 @@ import {
   Text,
 } from '@mantine/core';
 import { PATH_BOARD } from '@/routes';
-import { PageHeader, UesTable } from '@/components';
+import { BranchTable, LevelTable, PageHeader, UesTable } from '@/components';
 
 const items = [
   { title: 'Cenadi', href: PATH_BOARD.cenadi },
@@ -21,12 +22,6 @@ const items = [
     {item.title}
   </Anchor>
 ));
-
-const PAPER_PROPS: PaperProps = {
-  p: 'md',
-  shadow: 'md',
-  radius: 'md',
-};
 
 function Page() {
   // const {
@@ -44,9 +39,17 @@ function Page() {
       <Container fluid>
         <Stack gap="lg">
           <PageHeader title="Unitées d'Enseignement" breadcrumbItems={items} />
-          <Paper {...PAPER_PROPS}>
-            <UesTable />
-          </Paper>
+          <UesTable />
+          <Grid my={10}>
+            <Grid.Col span={{ base: 12, md: 6 }}>
+              <PageHeader title="Filières" />
+              <BranchTable />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, md: 6 }}>
+              <PageHeader title="Niveaux" />
+              <LevelTable />
+            </Grid.Col>
+          </Grid>
         </Stack>
       </Container>
     </>

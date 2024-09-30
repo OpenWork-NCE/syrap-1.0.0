@@ -12,8 +12,8 @@ import {
 } from '@mantine/core';
 import { PATH_BOARD, PATH_DASHBOARD } from '@/routes';
 import { PageHeader, InvoicesTable, UsersForm, UsersTable } from '@/components';
-import { IconDotsVertical } from '@tabler/icons-react';
 import { useFetchData } from '@/hooks';
+import BranchTable from '@/components/BranchTable/BranchTable';
 
 const items = [
   { title: 'Dashboard', href: PATH_BOARD.cenadi },
@@ -46,14 +46,8 @@ function Page() {
       <Container fluid>
         <Stack gap="lg">
           <PageHeader title="Utilisateurs" breadcrumbItems={items} />
-          <Paper {...PAPER_PROPS}>
-            <Group justify="space-between" mb="md">
-              <ActionIcon>
-                <IconDotsVertical size={18} />
-              </ActionIcon>
-            </Group>
-            <UsersTable />
-          </Paper>
+          {/*<UsersTable />*/}
+          <BranchTable />
         </Stack>
       </Container>
     </>

@@ -11,7 +11,12 @@ import {
   Text,
 } from '@mantine/core';
 import { PATH_BOARD, PATH_DASHBOARD } from '@/routes';
-import { PageHeader, UniversitiesTable } from '@/components';
+import {
+  PageHeader,
+  Syllabus,
+  SyllabusUTable,
+  UniversitiesTable,
+} from '@/components';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { useFetchData } from '@/hooks';
 
@@ -47,13 +52,7 @@ function Page() {
       <Container fluid>
         <Stack gap="lg">
           <PageHeader title="Programmes Universités" breadcrumbItems={items} />
-          <Paper {...PAPER_PROPS}>
-            <Group justify="space-between" mb="md">
-              <ActionIcon>
-                <IconDotsVertical size={18} />
-              </ActionIcon>
-            </Group>
-          </Paper>
+          <Syllabus />
         </Stack>
       </Container>
     </>

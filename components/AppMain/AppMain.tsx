@@ -8,7 +8,7 @@ type AppMainProps = {
 
 const AppMain = ({ children }: AppMainProps) => {
   return (
-    <Box py="lg" px="md" className={classes.main}>
+    <Box py="xs" px="xs" className={classes.main}>
       {children}
     </Box>
   );

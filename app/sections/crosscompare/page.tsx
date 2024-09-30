@@ -49,13 +49,6 @@ function Page() {
             title="Croiser et Comparer les programmes"
             breadcrumbItems={items}
           />
-          <Paper {...PAPER_PROPS}>
-            <Group justify="space-between" mb="md">
-              <ActionIcon>
-                <IconDotsVertical size={18} />
-              </ActionIcon>
-            </Group>
-          </Paper>
         </Stack>
       </Container>
     </>

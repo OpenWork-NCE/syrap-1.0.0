@@ -1,31 +1,32 @@
 {
   "data": [
     {
-      "title": "Sales Today",
+      "title": "Documents",
       "icon": "receipt",
-      "value": "13,456",
-      "diff": 34,
-      "period": "today"
-    },
-    {
-      "title": "Visitors",
-      "icon": "coin",
-      "value": "4,145",
-      "diff": -13,
-      "period": "annual"
-    },
-    {
-      "title": "Total Earnings",
-      "icon": "discount",
-      "value": "$ 74,5",
+      "value": "03",
       "diff": 18,
-      "period": "monthly"
+      "period": "Aujoud'hui"
     },
     {
-      "title": "Pending Orders",
+      "title": "IPES",
+      "icon": "coin",
+      "value": "20",
+      "diff": 18,
+      "period": "Tous"
+    },
+    {
+      "title": "Universités",
+      "icon": "discount",
+      "value": "25",
+      "diff": 18,
+      "period": "Tous"
+    },
+    {
+      "title": "UEs",
       "icon": "user",
       "value": "188",
-      "diff": -30
+      "diff": 18,
+      "period": "Tous"
     }
   ]
 }

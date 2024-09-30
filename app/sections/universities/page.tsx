@@ -46,14 +46,7 @@ function Page() {
       <Container fluid>
         <Stack gap="lg">
           <PageHeader title="Universités" breadcrumbItems={items} />
-          <Paper {...PAPER_PROPS}>
-            <Group justify="space-between" mb="md">
-              <ActionIcon>
-                <IconDotsVertical size={18} />
-              </ActionIcon>
-            </Group>
-            <UniversitiesTable />
-          </Paper>
+          <UniversitiesTable />
         </Stack>
       </Container>
     </>

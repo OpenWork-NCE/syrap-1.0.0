@@ -8,6 +8,7 @@ export const fakeData: User[] = [
     email: 'amadou.mbida@example.com',
     state: 'Centre',
     memberships: 'Cenadi',
+    profile: 'Admin',
   },
   {
     id: '2',
@@ -16,6 +17,7 @@ export const fakeData: User[] = [
     email: 'fatimatou.njoya@example.com',
     state: 'Littoral',
     memberships: 'Minesup',
+    profile: 'Admin',
   },
   {
     id: '3',
@@ -24,6 +26,7 @@ export const fakeData: User[] = [
     email: 'jean.eboa@example.com',
     state: 'Sud',
     memberships: 'Ipes',
+    profile: 'Admin',
   },
   {
     id: '4',
@@ -32,6 +35,7 @@ export const fakeData: User[] = [
     email: 'marie.ndongo@example.com',
     state: 'Est',
     memberships: 'Cenadi',
+    profile: 'Admin',
   },
   {
     id: '5',
@@ -40,6 +44,7 @@ export const fakeData: User[] = [
     email: 'pierre.essomba@example.com',
     state: 'Ouest',
     memberships: 'Minesup',
+    profile: 'Admin',
   },
   {
     id: '6',
@@ -48,6 +53,7 @@ export const fakeData: User[] = [
     email: 'raissa.mballa@example.com',
     state: 'Nord',
     memberships: 'Ipes',
+    profile: 'Admin',
   },
   {
     id: '7',
@@ -56,6 +62,7 @@ export const fakeData: User[] = [
     email: 'serge.atangana@example.com',
     state: 'Adamaoua',
     memberships: 'Cenadi',
+    profile: 'Admin',
   },
   {
     id: '8',
@@ -64,6 +71,7 @@ export const fakeData: User[] = [
     email: 'yvonne.meyo@example.com',
     state: 'Nord-Ouest',
     memberships: 'Minesup',
+    profile: 'Admin',
   },
   {
     id: '9',
@@ -72,6 +80,7 @@ export const fakeData: User[] = [
     email: 'alain.owona@example.com',
     state: 'Sud-Ouest',
     memberships: 'Ipes',
+    profile: 'Admin',
   },
   {
     id: '10',
@@ -80,6 +89,7 @@ export const fakeData: User[] = [
     email: 'brigitte.zogo@example.com',
     state: 'Extrême-Nord',
     memberships: 'Cenadi',
+    profile: 'Admin',
   },
   {
     id: '11',
@@ -88,6 +98,7 @@ export const fakeData: User[] = [
     email: 'charles.etoga@example.com',
     state: 'Centre',
     memberships: 'Minesup',
+    profile: 'Admin',
   },
   {
     id: '12',
@@ -96,6 +107,7 @@ export const fakeData: User[] = [
     email: 'danielle.nanga@example.com',
     state: 'Littoral',
     memberships: 'Ipes',
+    profile: 'Admin',
   },
   {
     id: '13',
@@ -104,6 +116,7 @@ export const fakeData: User[] = [
     email: 'eric.olinga@example.com',
     state: 'Sud',
     memberships: 'Cenadi',
+    profile: 'Admin',
   },
   {
     id: '14',
@@ -112,6 +125,7 @@ export const fakeData: User[] = [
     email: 'francoise.eyenga@example.com',
     state: 'Est',
     memberships: 'Minesup',
+    profile: 'Admin',
   },
   {
     id: '15',
@@ -120,6 +134,7 @@ export const fakeData: User[] = [
     email: 'georges.mbarga@example.com',
     state: 'Ouest',
     memberships: 'Ipes',
+    profile: 'Admin',
   },
   {
     id: '16',
@@ -128,6 +143,7 @@ export const fakeData: User[] = [
     email: 'henriette.ngono@example.com',
     state: 'Nord',
     memberships: 'Cenadi',
+    profile: 'Admin',
   },
   {
     id: '17',
@@ -136,6 +152,7 @@ export const fakeData: User[] = [
     email: 'ibrahim.djoumessi@example.com',
     state: 'Adamaoua',
     memberships: 'Minesup',
+    profile: 'Admin',
   },
   {
     id: '18',
@@ -144,6 +161,7 @@ export const fakeData: User[] = [
     email: 'jacqueline.foning@example.com',
     state: 'Nord-Ouest',
     memberships: 'Ipes',
+    profile: 'Admin',
   },
   {
     id: '19',
@@ -152,6 +170,7 @@ export const fakeData: User[] = [
     email: 'karim.tchouta@example.com',
     state: 'Sud-Ouest',
     memberships: 'Cenadi',
+    profile: 'Admin',
   },
   {
     id: '20',
@@ -160,6 +179,7 @@ export const fakeData: User[] = [
     email: 'lucie.yomba@example.com',
     state: 'Extrême-Nord',
     memberships: 'Minesup',
+    profile: 'Admin',
   },
   {
     id: '21',
@@ -168,6 +188,7 @@ export const fakeData: User[] = [
     email: 'marcel.ewane@example.com',
     state: 'Centre',
     memberships: 'Ipes',
+    profile: 'Admin',
   },
   {
     id: '22',
@@ -176,6 +197,7 @@ export const fakeData: User[] = [
     email: 'nadine.mengue@example.com',
     state: 'Littoral',
     memberships: 'Cenadi',
+    profile: 'Admin',
   },
   {
     id: '23',
@@ -184,6 +206,7 @@ export const fakeData: User[] = [
     email: 'olivier.abanda@example.com',
     state: 'Sud',
     memberships: 'Minesup',
+    profile: 'Admin',
   },
   {
     id: '24',
@@ -192,6 +215,7 @@ export const fakeData: User[] = [
     email: 'paulette.obama@example.com',
     state: 'Est',
     memberships: 'Ipes',
+    profile: 'Admin',
   },
   {
     id: '25',
@@ -200,6 +224,7 @@ export const fakeData: User[] = [
     email: 'quentin.nguema@example.com',
     state: 'Ouest',
     memberships: 'Cenadi',
+    profile: 'Admin',
   },
 ];
 
@@ -215,4 +240,17 @@ export const regions = [
   'Sud',
   'Est',
   'Nord-Ouest',
+];
+
+export const profiles = [
+  'Admin',
+  'Lecturer',
+  'Syllabus Manager',
+  'University Admin',
+  'Ipes Manager',
+  'Document Manager',
+  'User Manager',
+  'Level Coordinator',
+  'Branch Supervisor',
+  'General Viewer',
 ];

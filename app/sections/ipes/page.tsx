@@ -46,14 +46,7 @@ function Page() {
       <Container fluid>
         <Stack gap="lg">
           <PageHeader title="IPES" breadcrumbItems={items} />
-          <Paper {...PAPER_PROPS}>
-            <Group justify="space-between" mb="md">
-              <ActionIcon>
-                <IconDotsVertical size={18} />
-              </ActionIcon>
-              <IpesTable />
-            </Group>
-          </Paper>
+          <IpesTable />
         </Stack>
       </Container>
     </>

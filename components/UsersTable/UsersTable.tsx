@@ -22,7 +22,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import { fakeData, regions } from './makeData';
+import { fakeData, profiles, regions } from './makeData';
 import { type User } from '@/types';
 
 const Section = () => {
@@ -82,6 +82,16 @@ const Section = () => {
               ...validationErrors,
               email: undefined,
             }),
+        },
+      },
+      {
+        accessorKey: 'profile',
+        header: 'Profile utilisateur',
+        editVariant: 'select',
+        mantineEditSelectProps: {
+          data: profiles,
+          required: true,
+          error: validationErrors?.profile,
         },
       },
       {
@@ -180,6 +190,20 @@ const Section = () => {
     createDisplayMode: 'row', // ('modal', and 'custom' are also available)
     editDisplayMode: 'row', // ('modal', 'cell', 'table', and 'custom' are also available)
     enableEditing: true,
+    enableRowSelection: true,
+    positionToolbarAlertBanner: 'bottom',
+    positionActionsColumn: 'last',
+    enableColumnFilterModes: true,
+    enableColumnOrdering: true,
+    enableDensityToggle: true,
+    enableGlobalFilterModes: true,
+    enableMultiRowSelection: true,
+    enableFacetedValues: true,
+    enableRowNumbers: true,
+    enableRowActions: true,
+    enableColumnPinning: true,
+    enableGrouping: true,
+    enablePagination: true,
     getRowId: (row) => row.id,
     mantineToolbarAlertBannerProps: isLoadingUsersError
       ? {
@@ -190,6 +214,13 @@ const Section = () => {
     mantineTableContainerProps: {
       style: {
         minHeight: '500px',
+      },
+    },
+    initialState: {
+      density: 'xs',
+      columnPinning: {
+        left: ['mrt-row-select'],
+        right: ['mrt-row-actions', 'mrt-row-expand'],
       },
     },
     onCreatingRowCancel: () => setValidationErrors({}),
@@ -347,6 +378,7 @@ function validateUser(user: User) {
     firstName: !validateRequired(user.firstName) ? 'Nom requis' : '',
     lastName: !validateRequired(user.lastName) ? 'Prénom requis' : '',
     email: !validateEmail(user.email) ? 'Incorrect Email Format' : '',
+    profile: !validateRequired(user.profile) ? 'Profil requis' : '',
     state: !validateRequired(user.state) ? 'Region requise' : '',
     memberships: !validateRequired(user.memberships)
       ? "Intitution d'appartenance requise"

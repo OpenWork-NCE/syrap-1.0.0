@@ -3,6 +3,7 @@ import {
   IconChartArea,
   IconChartBar,
   IconCross,
+  IconFile,
   IconFileDownload,
   IconFiles,
   IconFileUpload,
@@ -40,14 +41,9 @@ const mockdata = [
     title: 'Documents',
     links: [
       {
-        label: 'Téléchargements',
-        icon: IconFileDownload,
-        link: PATH_SECTIONS.downloads,
-      },
-      {
-        label: 'Téléversements',
-        icon: IconFileUpload,
-        link: PATH_SECTIONS.uploads,
+        label: 'Tous les documents',
+        icon: IconFile,
+        link: PATH_SECTIONS.documents,
       },
     ],
   },

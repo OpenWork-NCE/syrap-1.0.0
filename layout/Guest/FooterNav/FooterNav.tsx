@@ -36,7 +36,7 @@ const FooterNav = () => {
 
   return (
     <footer className={classes.footer}>
-      <Container fluid >
+      <Container fluid>
         <Divider mt="xl" mb="md" />
         <Flex
           direction={{ base: 'column', sm: 'row' }}
@@ -52,7 +52,7 @@ const FooterNav = () => {
               // href={PATH_GITHUB.org}
               target="_blank"
             >
-              &copy;&nbsp;{new Date().getFullYear()}&nbsp;SYRAP
+              &copy;&nbsp;{new Date().getFullYear()}&nbsp;CENADI
             </Text>
           </Flex>
         </Flex>

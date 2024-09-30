@@ -13,6 +13,7 @@ function PasswordLayout({ children }: AuthProps) {
     <Center
       style={{
         height: '100vh',
+
         width: '100vw',
       }}
     >

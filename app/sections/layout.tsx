@@ -29,7 +29,7 @@ function RoleLayout({ children }: Props) {
       footer={{ height: 60 }}
       navbar={{
         width: 300,
-        breakpoint: 'md',
+        breakpoint: 'sx',
         collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
       }}
       padding={0}
@@ -62,7 +62,7 @@ function RoleLayout({ children }: Props) {
       <AppShell.Main>
         <AppMain>{children}</AppMain>
       </AppShell.Main>
-      <AppShell.Footer p="md">
+      <AppShell.Footer p="xs">
         <Container fluid px="lg">
           <FooterNav />
         </Container>

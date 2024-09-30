@@ -18,6 +18,7 @@ const ROOTS_DOCUMENTS = '/documents';
 const ROOTS_USERS = '/users';
 const ROOT_SECTIONS = '/sections';
 const ROOTS_UNIVERSITIES = '/universities';
+const ROOTS_IPES = '/ipes';
 
 export const PATH_SECTIONS = {
   root: ROOT_SECTIONS,
@@ -32,9 +33,14 @@ export const PATH_SECTIONS = {
       path(ROOT_SECTIONS, ROOTS_UNIVERSITIES + `/${id}`),
   },
   crosscompare: path(ROOT_SECTIONS, '/crosscompare'),
-  ipes: path(ROOT_SECTIONS, '/ipes'),
-  downloads: path(ROOT_SECTIONS, '/documents/downloads'),
-  uploads: path(ROOT_SECTIONS, '/documents/uploads'),
+  ipes: {
+    all: path(ROOT_SECTIONS, ROOTS_IPES + '/'),
+    syllabus: path(ROOT_SECTIONS, ROOTS_IPES + `/syllabus`),
+    documents: path(ROOT_SECTIONS, ROOTS_IPES + `/documents`),
+    ipes_details: (id: string): string =>
+      path(ROOT_SECTIONS, ROOTS_IPES + `/${id}`),
+  },
+  documents: path(ROOT_SECTIONS, '/documents/documents'),
   reports: path(ROOT_SECTIONS, '/reports'),
   logs: path(ROOT_SECTIONS, '/logs'),
 };

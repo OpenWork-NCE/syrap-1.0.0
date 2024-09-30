@@ -3,7 +3,7 @@
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
-import { Raleway } from 'next/font/google';
+import { EB_Garamond } from 'next/font/google';
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
 import '@mantine/tiptap/styles.css';
@@ -14,7 +14,7 @@ import './globals.css';
 import { useTheme } from '@/app/lib/store';
 
 // If loading a variable font, you don't need to specify the font weight
-const raleway = Raleway({
+const eb_garamond = EB_Garamond({
   subsets: ['latin'],
   display: 'swap',
 });
@@ -26,7 +26,7 @@ export default function RootLayout({
 }) {
   const myTheme = useTheme((state: any) => state.theme);
   return (
-    <html lang="fr" className={raleway.className}>
+    <html lang="fr" className={eb_garamond.className}>
       <head>
         <title>
           SYRAP - Harmonisation des programmes d'universités du Cameroun

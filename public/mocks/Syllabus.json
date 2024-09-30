@@ -1,0 +1,252 @@
+[
+  {
+    "id": "1",
+    "name": "Licence en Informatique Générale",
+    "modules": [
+      {
+        "id": "101",
+        "name": "Programmation et Développement",
+        "ues": [
+          {
+            "id": "1011",
+            "ue_name": "Programmation en Python",
+            "slug": "programmation-python",
+            "nbr_hours": 45,
+            "description": "Introduction aux concepts de programmation en Python, gestion des erreurs, boucles et structures de contrôle.",
+            "user_creator": "Professeur Mbangue"
+          },
+          {
+            "id": "1012",
+            "ue_name": "Algorithmes et Structures de Données",
+            "slug": "algorithmes-structures",
+            "nbr_hours": 50,
+            "description": "Études des structures de données comme les listes, piles, files et arbres, et des algorithmes de base.",
+            "user_creator": "Professeur Ndifor"
+          }
+        ]
+      },
+      {
+        "id": "102",
+        "name": "Systèmes d'Information",
+        "ues": [
+          {
+            "id": "1021",
+            "ue_name": "Introduction aux Bases de Données",
+            "slug": "introduction-bases-donnees",
+            "nbr_hours": 40,
+            "description": "Concepts fondamentaux des bases de données relationnelles, normalisation, et langage SQL.",
+            "user_creator": "Professeur Fotso"
+          },
+          {
+            "id": "1022",
+            "ue_name": "Modélisation des Systèmes d'Information",
+            "slug": "modelisation-systèmes-information",
+            "nbr_hours": 35,
+            "description": "Techniques de modélisation des systèmes d’information à l'aide des diagrammes UML.",
+            "user_creator": "Professeur Akom"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "name": "Master en Sécurité Informatique",
+    "modules": [
+      {
+        "id": "201",
+        "name": "Sécurité des Réseaux",
+        "ues": [
+          {
+            "id": "2011",
+            "ue_name": "Cryptographie",
+            "slug": "cryptographie",
+            "nbr_hours": 40,
+            "description": "Introduction aux méthodes cryptographiques modernes telles que AES et RSA.",
+            "user_creator": "Professeur Etame"
+          },
+          {
+            "id": "2012",
+            "ue_name": "Sécurité des Réseaux Sans Fil",
+            "slug": "securite-reseaux-sans-fil",
+            "nbr_hours": 30,
+            "description": "Protocole de sécurité pour les réseaux sans fil, chiffrement WPA2, et VPN.",
+            "user_creator": "Professeur Foba"
+          }
+        ]
+      },
+      {
+        "id": "202",
+        "name": "Sécurité des Applications",
+        "ues": [
+          {
+            "id": "2021",
+            "ue_name": "Sécurité des Applications Web",
+            "slug": "securite-applications-web",
+            "nbr_hours": 50,
+            "description": "Introduction aux vulnérabilités des applications web comme l'injection SQL et les failles XSS.",
+            "user_creator": "Professeur Ekane"
+          },
+          {
+            "id": "2022",
+            "ue_name": "Tests d'Intrusion",
+            "slug": "tests-intrusion",
+            "nbr_hours": 45,
+            "description": "Techniques de pentesting pour évaluer la sécurité des systèmes informatiques.",
+            "user_creator": "Professeur Tchebetchou"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "3",
+    "name": "Licence en Développement d'Applications Mobiles",
+    "modules": [
+      {
+        "id": "301",
+        "name": "Développement Android",
+        "ues": [
+          {
+            "id": "3011",
+            "ue_name": "Programmation Java",
+            "slug": "programmation-java",
+            "nbr_hours": 60,
+            "description": "Introduction à la programmation en Java pour le développement d'applications Android.",
+            "user_creator": "Professeur Biloa"
+          },
+          {
+            "id": "3012",
+            "ue_name": "Interfaces Mobiles",
+            "slug": "interfaces-mobiles",
+            "nbr_hours": 35,
+            "description": "Conception et développement d'interfaces utilisateur en utilisant le Material Design.",
+            "user_creator": "Professeur Tchoumi"
+          }
+        ]
+      },
+      {
+        "id": "302",
+        "name": "Développement iOS",
+        "ues": [
+          {
+            "id": "3021",
+            "ue_name": "Programmation Swift",
+            "slug": "programmation-swift",
+            "nbr_hours": 50,
+            "description": "Introduction au développement mobile avec le langage Swift.",
+            "user_creator": "Professeur Nkou"
+          },
+          {
+            "id": "3022",
+            "ue_name": "Gestion de Mémoire iOS",
+            "slug": "gestion-memoire-ios",
+            "nbr_hours": 30,
+            "description": "Optimisation de la gestion de mémoire pour les applications iOS.",
+            "user_creator": "Professeur Kamga"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "4",
+    "name": "Master en Intelligence Artificielle",
+    "modules": [
+      {
+        "id": "401",
+        "name": "Apprentissage Automatique",
+        "ues": [
+          {
+            "id": "4011",
+            "ue_name": "Introduction au Machine Learning",
+            "slug": "introduction-machine-learning",
+            "nbr_hours": 40,
+            "description": "Supervised learning, unsupervised learning et techniques avancées.",
+            "user_creator": "Professeur Zoa"
+          },
+          {
+            "id": "4012",
+            "ue_name": "Réseaux de Neurones",
+            "slug": "reseaux-de-neurones",
+            "nbr_hours": 50,
+            "description": "Introduction aux réseaux de neurones artificiels et aux algorithmes d'apprentissage profond.",
+            "user_creator": "Professeur Tamgue"
+          }
+        ]
+      },
+      {
+        "id": "402",
+        "name": "Big Data",
+        "ues": [
+          {
+            "id": "4021",
+            "ue_name": "Analyse de Données avec Hadoop",
+            "slug": "analyse-donnees-hadoop",
+            "nbr_hours": 45,
+            "description": "Outils Big Data pour la gestion et l'analyse de grandes quantités de données.",
+            "user_creator": "Professeur Kenfack"
+          },
+          {
+            "id": "4022",
+            "ue_name": "Base de Données NoSQL",
+            "slug": "base-de-donnees-nosql",
+            "nbr_hours": 40,
+            "description": "Introduction aux bases de données NoSQL telles que MongoDB et Cassandra.",
+            "user_creator": "Professeur Eboko"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "5",
+    "name": "Licence en Cybersécurité",
+    "modules": [
+      {
+        "id": "501",
+        "name": "Sécurité Réseau",
+        "ues": [
+          {
+            "id": "5011",
+            "ue_name": "Firewall et VPN",
+            "slug": "firewall-vpn",
+            "nbr_hours": 35,
+            "description": "Introduction aux firewalls, VPN, et gestion des accès réseau.",
+            "user_creator": "Professeur Mouafo"
+          },
+          {
+            "id": "5012",
+            "ue_name": "Intrusion Detection Systems",
+            "slug": "intrusion-detection-systems",
+            "nbr_hours": 40,
+            "description": "Utilisation des systèmes de détection d'intrusion pour protéger les réseaux.",
+            "user_creator": "Professeur Essama"
+          }
+        ]
+      },
+      {
+        "id": "502",
+        "name": "Sécurité des Applications",
+        "ues": [
+          {
+            "id": "5021",
+            "ue_name": "Sécurité des API",
+            "slug": "securite-api",
+            "nbr_hours": 45,
+            "description": "Techniques de sécurisation des API RESTful et protection contre les attaques XSS.",
+            "user_creator": "Professeur Djikou"
+          },
+          {
+            "id": "5022",
+            "ue_name": "Gestion des Clés Cryptographiques",
+            "slug": "gestion-cles-cryptographiques",
+            "nbr_hours": 35,
+            "description": "Introduction aux méthodes de gestion des clés cryptographiques dans les environnements sécurisés.",
+            "user_creator": "Professeur Ntoung"
+          }
+        ]
+      }
+    ]
+  }
+]

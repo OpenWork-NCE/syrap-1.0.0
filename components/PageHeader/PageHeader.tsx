@@ -84,41 +84,6 @@ const PageHeader = (props: PageHeaderProps) => {
               </ActionIcon>
             </Flex>
           </Flex>
-        ) : invoiceAction ? (
-          <Flex
-            align="center"
-            justify="space-between"
-            direction={{ base: 'row', sm: 'row' }}
-            gap={{ base: 'sm', sm: 4 }}
-          >
-            <Stack>
-              <Title order={3}>{title}</Title>
-              <Breadcrumbs {...BREADCRUMBS_PROPS}>
-                {breadcrumbItems}
-              </Breadcrumbs>
-            </Stack>
-            <Button leftSection={<IconPlus size={18} />}>New Invoice</Button>
-          </Flex>
-        ) : uesAction ? (
-          <Flex
-            align="center"
-            justify="space-between"
-            direction={{ base: 'row', sm: 'row' }}
-            gap={{ base: 'sm', sm: 4 }}
-          >
-            <Stack>
-              <Title order={3}>{title}</Title>
-              <Breadcrumbs {...BREADCRUMBS_PROPS}>
-                {breadcrumbItems}
-              </Breadcrumbs>
-            </Stack>
-            <Group justify="flex-end">
-              <Button leftSection={<IconPlus size={18} />}>Nouvel UE</Button>
-              <Button leftSection={<IconPlus size={18} />}>
-                Exporter tout
-              </Button>
-            </Group>
-          </Flex>
         ) : (
           <Stack gap="sm">
             <Title order={3}>{title}</Title>
@@ -126,7 +91,6 @@ const PageHeader = (props: PageHeaderProps) => {
           </Stack>
         )}
       </Surface>
-      <Divider />
     </>
   );
 };

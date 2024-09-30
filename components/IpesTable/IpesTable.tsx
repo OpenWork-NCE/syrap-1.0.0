@@ -45,13 +45,30 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import { fakeData } from './makeData';
-import { type Ipes } from '@/types';
+import { fakeData, type IpesContext as Ipes } from './makeData';
 import { jsPDF } from 'jspdf'; //or use your library of choice here
 import autoTable from 'jspdf-autotable';
 import { mkConfig, generateCsv, download } from 'export-to-csv';
 import { useRouter } from 'next/navigation';
 import { PATH_SECTIONS } from '@/routes';
+
+const mocksDatas: any = fakeData.map((fake) => {
+  return {
+    id: fake.id,
+    name: fake.name,
+    phone: fake.phone,
+    email: fake.email,
+    borough: fake.borough,
+    created_user: fake.created_user,
+    university: fake.university,
+    decret_of_creation: fake.decret_of_creation,
+    opening_stop: fake.opening_stop,
+    promoter: fake.promoter,
+    matching: fake.matching,
+    branch_count: fake.branch_count,
+    level_count: fake.level_count,
+  };
+});
 
 const csvConfig = mkConfig({
   fieldSeparator: ',',
@@ -85,7 +102,7 @@ const Section = () => {
   };
 
   const handleExportDataAsCSV = () => {
-    const csv = generateCsv(csvConfig)(fakeData);
+    const csv = generateCsv(csvConfig)(mocksDatas);
     download(csvConfig)(csv);
   };
 
@@ -532,7 +549,14 @@ const Section = () => {
               </span>
             </Text>
             <Divider pb={1} mb={10} />
-            <Button leftSection={<IconEye />}>Details</Button>
+            <Button
+              leftSection={<IconEye />}
+              onClick={() => {
+                push(PATH_SECTIONS.ipes.ipes_details(row.original.id));
+              }}
+            >
+              Details
+            </Button>
           </Box>
         </Box>
       </Box>

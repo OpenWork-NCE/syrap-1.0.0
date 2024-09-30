@@ -1,56 +1,52 @@
 'use client';
 
-import '@mantine/core/styles.css';
-import '@mantine/dates/styles.css'; //if using mantine date picker features
-import 'mantine-react-table/styles.css'; //make sure MRT styles were imported in your app root (once)
 import { useMemo, useState } from 'react';
 import {
-  MRT_EditActionButtons,
   MantineReactTable,
-  // createRow,
-  type MRT_ColumnDef,
-  type MRT_Row,
-  type MRT_TableOptions,
   useMantineReactTable,
+  type MRT_ColumnDef,
+  type MRT_ColumnFiltersState,
+  type MRT_PaginationState,
+  type MRT_SortingState,
+  type MRT_ColumnFilterFnsState,
+  MRT_EditActionButtons,
+  MRT_TableOptions,
+  MRT_Row,
 } from 'mantine-react-table';
 import {
   ActionIcon,
   Box,
-  Menu,
   Button,
+  Divider,
   Flex,
+  Menu,
   Stack,
   Text,
   Title,
   Tooltip,
-  Divider,
 } from '@mantine/core';
-import { ModalsProvider, modals } from '@mantine/modals';
 import {
-  IconDetails,
   IconDownload,
   IconEdit,
-  IconEye,
-  IconFileExport,
   IconFileTypeCsv,
   IconFileTypePdf,
   IconPlus,
+  IconRefresh,
   IconTableExport,
   IconTrash,
 } from '@tabler/icons-react';
 import {
   QueryClient,
   QueryClientProvider,
-  useMutation,
+  keepPreviousData,
   useQuery,
   useQueryClient,
+  useMutation,
 } from '@tanstack/react-query';
-import { type BranchContext } from './makeData';
-import { type Branch } from '@/types';
-import { jsPDF } from 'jspdf'; //or use your library of choice here
+import { modals } from '@mantine/modals';
+import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { mkConfig, generateCsv, download } from 'export-to-csv';
-import { LevelTable } from '@/components';
+import { download, generateCsv, mkConfig } from 'export-to-csv';
 
 const csvConfig = mkConfig({
   fieldSeparator: ',',
@@ -58,21 +54,66 @@ const csvConfig = mkConfig({
   useKeysAsHeaders: true,
 });
 
-type BranchTableProps = {
-  datas: Branch[];
+type Branch = {
+  id: string;
+  name: string;
 };
 
-type SectionProps = {
-  fakeData: BranchContext[];
-  fakeDataWithLevel: Branch[];
+type BranchApiResponse = {
+  data: Array<Branch>;
 };
 
-const Section = ({ fakeData, fakeDataWithLevel }: SectionProps) => {
+interface Params {
+  columnFilterFns: MRT_ColumnFilterFnsState;
+  columnFilters: MRT_ColumnFiltersState;
+  globalFilter: string;
+  sorting: MRT_SortingState;
+  pagination: MRT_PaginationState;
+}
+
+//custom react-query hook
+const useGetBranchs = ({
+  columnFilterFns,
+  columnFilters,
+  globalFilter,
+  sorting,
+  pagination,
+}: Params) => {
+  //build the URL (https://www.mantine-react-table.com/api/data?start=0&size=10&filters=[]&globalFilter=&sorting=[])
+  const fetchURL = new URL(
+    '/api/branches',
+    process.env.NODE_ENV === 'production'
+      ? 'https://www.mantine-react-table.com'
+      : 'http://localhost:3000',
+  );
+  // fetchURL.searchParams.set(
+  //   'start',
+  //   `${pagination.pageIndex * pagination.pageSize}`,
+  // );
+  // fetchURL.searchParams.set('size', `${pagination.pageSize}`);
+  // fetchURL.searchParams.set('filters', JSON.stringify(columnFilters ?? []));
+  // fetchURL.searchParams.set(
+  //   'filterModes',
+  //   JSON.stringify(columnFilterFns ?? {}),
+  // );
+  // fetchURL.searchParams.set('globalFilter', globalFilter ?? '');
+  // fetchURL.searchParams.set('sorting', JSON.stringify(sorting ?? []));
+
+  return useQuery<BranchApiResponse>({
+    // queryKey: ['branches', fetchURL.href], //refetch whenever the URL changes (columnFilters, globalFilter, sorting, pagination),
+    queryKey: ['branches'], //refetch whenever the URL changes (columnFilters, globalFilter, sorting, pagination)
+    queryFn: () => fetch(fetchURL.href).then((res) => res.json()),
+    placeholderData: keepPreviousData, //useful for paginated queries by keeping data from previous pages on screen while fetching the next page
+    staleTime: 30_000, //don't refetch previously viewed pages until cache is more than 30 seconds old
+  });
+};
+
+const Section = () => {
   const [validationErrors, setValidationErrors] = useState<
     Record<string, string | undefined>
   >({});
 
-  const handleExportRows = (rows: MRT_Row<BranchContext>[]) => {
+  const handleExportRows = (rows: MRT_Row<Branch>[]) => {
     const doc = new jsPDF();
     const tableData = rows.map((row) => Object.values(row.original));
     const tableHeaders = columns.map((c) => c.header);
@@ -82,32 +123,30 @@ const Section = ({ fakeData, fakeDataWithLevel }: SectionProps) => {
       body: tableData,
     });
 
-    doc.save('syrap-branch.pdf');
+    doc.save('syrap-filières.pdf');
   };
 
-  const handleExportRowsAsCSV = (rows: MRT_Row<BranchContext>[]) => {
+  const handleExportRowsAsCSV = (rows: MRT_Row<Branch>[]) => {
     const rowData = rows.map((row) => row.original);
     const csv = generateCsv(csvConfig)(rowData);
     download(csvConfig)(csv);
   };
 
   const handleExportDataAsCSV = () => {
-    const csv = generateCsv(csvConfig)(fakeData);
+    const csv = generateCsv(csvConfig)(fetchedBranchs);
     download(csvConfig)(csv);
   };
 
-  const columns = useMemo<MRT_ColumnDef<BranchContext>[]>(
+  const columns = useMemo<MRT_ColumnDef<Branch>[]>(
     () => [
       {
         accessorKey: 'id',
         header: 'Identifiant',
         enableEditing: false,
-        size: 80,
       },
       {
         accessorKey: 'name',
-        header: 'Filière',
-
+        header: 'Nom',
         mantineEditTextInputProps: {
           type: 'text',
           required: true,
@@ -122,8 +161,38 @@ const Section = ({ fakeData, fakeDataWithLevel }: SectionProps) => {
         },
       },
     ],
-    [validationErrors],
+    [],
   );
+
+  //Manage MRT state that we want to pass to our API
+  const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>(
+    [],
+  );
+  const [columnFilterFns, setColumnFilterFns] = //filter modes
+    useState<MRT_ColumnFilterFnsState>(
+      Object.fromEntries(
+        columns.map(({ accessorKey }) => [accessorKey, 'contains']),
+      ),
+    ); //default to "contains" for all columns
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [sorting, setSorting] = useState<MRT_SortingState>([]);
+  const [pagination, setPagination] = useState<MRT_PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+
+  //call our custom react-query hook
+  const { data, isError, isFetching, isLoading, refetch } = useGetBranchs({
+    columnFilterFns,
+    columnFilters,
+    globalFilter,
+    pagination,
+    sorting,
+  });
+
+  //this will depend on your API response shape
+  const fetchedBranchs = data?.data ?? [];
+  // const totalRowCount = data?.meta?.totalRowCount ?? 0;
 
   //call CREATE hook
   const { mutateAsync: createBranch, isPending: isCreatingBranch } =
@@ -136,7 +205,7 @@ const Section = ({ fakeData, fakeDataWithLevel }: SectionProps) => {
     useDeleteBranch();
 
   //CREATE action
-  const handleCreateBranch: MRT_TableOptions<BranchContext>['onCreatingRowSave'] =
+  const handleCreateBranch: MRT_TableOptions<Branch>['onCreatingRowSave'] =
     async ({ values, exitCreatingMode }) => {
       const newValidationErrors = validateBranch(values);
       if (Object.values(newValidationErrors).some((error) => error)) {
@@ -149,20 +218,20 @@ const Section = ({ fakeData, fakeDataWithLevel }: SectionProps) => {
     };
 
   //UPDATE action
-  const handleSaveBranch: MRT_TableOptions<BranchContext>['onEditingRowSave'] =
-    async ({ values, table }) => {
+  const handleSaveBranch: MRT_TableOptions<Branch>['onEditingRowSave'] =
+    async ({ values, table, row }) => {
       const newValidationErrors = validateBranch(values);
       if (Object.values(newValidationErrors).some((error) => error)) {
         setValidationErrors(newValidationErrors);
         return;
       }
       setValidationErrors({});
-      await updateBranch(values);
+      await updateBranch({ id: row.id, name: values.name });
       table.setEditingRow(null); //exit editing mode
     };
 
   //DELETE action
-  const openDeleteConfirmModal = (row: MRT_Row<BranchContext>) =>
+  const openDeleteConfirmModal = (row: MRT_Row<Branch>) =>
     modals.openConfirmModal({
       title: 'Etes vous sur de vouloir supprimer cette Filière ?',
       children: (
@@ -178,9 +247,9 @@ const Section = ({ fakeData, fakeDataWithLevel }: SectionProps) => {
 
   const table = useMantineReactTable({
     columns,
-    data: fakeData,
-    createDisplayMode: 'row', //default ('row', and 'custom' are also available)
-    editDisplayMode: 'row', //default ('row', 'cell', 'table', and 'custom' are also available)
+    data: fetchedBranchs,
+    createDisplayMode: 'modal', //default ('row', and 'custom' are also available)
+    editDisplayMode: 'modal', //default ('row', 'cell', 'table', and 'custom' are also available)
     enableEditing: true,
     enableRowSelection: true,
     positionToolbarAlertBanner: 'bottom',
@@ -207,7 +276,7 @@ const Section = ({ fakeData, fakeDataWithLevel }: SectionProps) => {
       },
       pagination: {
         pageIndex: 0,
-        pageSize: 5,
+        pageSize: 10,
       },
     },
 
@@ -218,12 +287,12 @@ const Section = ({ fakeData, fakeDataWithLevel }: SectionProps) => {
     //
     // ),
     getRowId: (row) => row.id,
-    // mantineToolbarAlertBannerProps: isLoadingBranchError
-    //   ? {
-    //       color: 'red',
-    //       children: 'Erreur de chargement des données',
-    //     }
-    //   : undefined,
+    mantineToolbarAlertBannerProps: isError
+      ? {
+          color: 'red',
+          children: 'Erreur de chargement des données',
+        }
+      : undefined,
     mantineTableContainerProps: {
       style: {
         minHeight: '500px',
@@ -235,7 +304,7 @@ const Section = ({ fakeData, fakeDataWithLevel }: SectionProps) => {
     onEditingRowSave: handleSaveBranch,
     renderCreateRowModalContent: ({ table, row, internalEditComponents }) => (
       <Stack>
-        <Title order={3}>Nouvel Université</Title>
+        <Title order={3}>Nouvelle Filière</Title>
         {internalEditComponents}
         <Flex justify="flex-end" mt="xl">
           <MRT_EditActionButtons variant="text" table={table} row={row} />
@@ -244,7 +313,7 @@ const Section = ({ fakeData, fakeDataWithLevel }: SectionProps) => {
     ),
     renderEditRowModalContent: ({ table, row, internalEditComponents }) => (
       <Stack>
-        <Title order={3}>Editer l'Université</Title>
+        <Title order={3}>Editer la filière</Title>
         {internalEditComponents}
         <Flex justify="flex-end" mt="xl">
           <MRT_EditActionButtons variant="text" table={table} row={row} />
@@ -268,23 +337,19 @@ const Section = ({ fakeData, fakeDataWithLevel }: SectionProps) => {
           <Divider pb={1} mb={10} />
           <Box style={{ fontSize: '16px' }}>
             <Text size={'sm'}>
-              Identifiant Unique :{' '}
-              <span style={{ fontWeight: 'bolder' }}>{row.original.id}</span>
-            </Text>
-            <Text size={'sm'}>
               Intitulé de la filière :{' '}
               <span style={{ fontWeight: 'bolder' }}>{row.original.name}</span>
             </Text>
             <Divider my={10} />
-            <Title order={5} mb={5}>
-              Niveaux de la filière
-            </Title>
-            <LevelTable
-              datas={
-                fakeDataWithLevel.find((el) => el.id === row.original.id)
-                  ?.levels
-              }
-            />
+            {/*<Title order={5} mb={5}>*/}
+            {/*  Niveaux de la filière*/}
+            {/*</Title>*/}
+            {/*<LevelTable*/}
+            {/*  datas={*/}
+            {/*    fakeDataWithLevel.find((el) => el.id === row.original.id)*/}
+            {/*      ?.levels*/}
+            {/*  }*/}
+            {/*/>*/}
           </Box>
         </Box>
       </Box>
@@ -312,7 +377,12 @@ const Section = ({ fakeData, fakeDataWithLevel }: SectionProps) => {
 
     renderTopToolbarCustomActions: ({ table }) => (
       <>
-        <Flex gap={4} justify={'flex-end'}>
+        <Flex gap={4} justify={'flex-end'} align={'center'}>
+          <Tooltip label="Rafraichir des données">
+            <ActionIcon onClick={() => refetch()}>
+              <IconRefresh />
+            </ActionIcon>
+          </Tooltip>
           <Button
             onClick={() => {
               table.setCreatingRow(true); //simplest way to open the create row modal with no default values
@@ -325,7 +395,7 @@ const Section = ({ fakeData, fakeDataWithLevel }: SectionProps) => {
             }}
             leftSection={<IconPlus />}
           >
-            Nouvelle Branch
+            Nouvelle Filière
           </Button>
           <Menu
             shadow={'md'}
@@ -423,116 +493,185 @@ const Section = ({ fakeData, fakeDataWithLevel }: SectionProps) => {
       </>
     ),
     state: {
-      // isLoading: isLoadingBranch,
+      columnFilterFns,
+      columnFilters,
+      globalFilter,
+      pagination,
+      isLoading: isLoading,
       isSaving: isCreatingBranch || isUpdatingBranch || isDeletingBranch,
-      // showAlertBanner: isLoadingBranchError,
-      // showProgressBars: isFetchingBranch,
+      showAlertBanner: isError,
+      showProgressBars: isFetching,
+      sorting,
     },
   });
 
   return <MantineReactTable table={table} />;
 };
 
-//CREATE hook (post new user to api)
+//CREATE hook (post new branch to api)
 function useCreateBranch() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (user: BranchContext) => {
-      //send api update request here
-      await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
-      return Promise.resolve();
+    mutationFn: async (branch: Branch) => {
+      // Envoie de la requête API pour créer une nouvelle branche
+      const response = await fetch(
+        'http://localhost:3000/api/branches/create',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(branch), // Envoyer les informations de la nouvelle branche au serveur
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la création de la filière');
+      }
+
+      // Retourner la réponse du serveur (optionnel)
+      return await response.json();
     },
     //client side optimistic update
-    onMutate: (newBranchInfo: BranchContext) => {
-      queryClient.setQueryData(
-        ['users'],
-        (prevBranchs: any) =>
-          [
-            ...prevBranchs,
-            {
-              ...newBranchInfo,
-              id: (Math.random() + 1).toString(36).substring(7),
-            },
-          ] as BranchContext[],
-      );
+    onMutate: (newBranchInfo: Branch) => {
+      queryClient.setQueryData(['branches'], (prevBranchs: any) => {
+        // Vérifier si prevBranchs est un tableau, sinon, initialisez-le comme un tableau vide
+        const branchList = Array.isArray(prevBranchs) ? prevBranchs : [];
+        return [
+          ...branchList,
+          {
+            ...newBranchInfo,
+            id: (Math.random() + 1).toString(36).substring(7), // Créer un ID temporaire
+          },
+        ] as Branch[];
+      });
     },
-    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['users'] }), //refetch users after mutation, disabled for demo
+    // Rafraîchissement des données après la mutation
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['branches'] });
+    },
   });
 }
 
-//UPDATE hook (put user in api)
+//UPDATE hook (put branch in api)
 function useUpdateBranch() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (user: BranchContext) => {
-      //send api update request here
-      await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
-      return Promise.resolve();
+    mutationFn: async (branch: Branch) => {
+      // Envoie de la requête API pour mettre a jour une nouvelle branche
+      const response = await fetch(
+        `http://localhost:3000/api/branches/${branch.id}/update`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(branch), // Envoyer les informations pour la modification de la branche
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la mise à jour de la filière');
+      }
+
+      // Retourner la réponse du serveur (optionnel)
+      return await response.json();
     },
     //client side optimistic update
-    onMutate: (newBranchInfo: BranchContext) => {
-      queryClient.setQueryData(
-        ['users'],
-        (prevBranchs: any) =>
-          prevBranchs?.map((prevBranch: BranchContext) =>
-            prevBranch.id === newBranchInfo.id ? newBranchInfo : prevBranch,
-          ),
-      );
+    onMutate: (newBranchInfo: Branch) => {
+      queryClient.setQueryData(['branches'], (prevBranchs: any) => {
+        const branchList = Array.isArray(prevBranchs) ? prevBranchs : [];
+
+        return branchList.map((branch: Branch) =>
+          branch.id === newBranchInfo.id
+            ? { ...branch, ...newBranchInfo }
+            : branch,
+        );
+      });
     },
-    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['users'] }), //refetch users after mutation, disabled for demo
+    // Invalider le cache après la mutation pour obtenir les données actualisées
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['branches'] });
+    },
   });
 }
 
-//DELETE hook (delete user in api)
+//DELETE hook (delete branch in api)
 function useDeleteBranch() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (branchId: string) => {
-      //send api update request here
-      await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
-      return Promise.resolve();
-    },
-    //client side optimistic update
-    onMutate: (branchId: string) => {
-      queryClient.setQueryData(
-        ['users'],
-        (prevBranchs: any) =>
-          prevBranchs?.filter(
-            (branch: BranchContext) => branch.id !== branchId,
-          ),
+      // Envoi de la requête API pour supprimer la branche
+      const response = await fetch(
+        `http://localhost:3000/api/branches/${branchId}/delete`,
+        {
+          method: 'DELETE', // DELETE pour signifier la suppression
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ id: branchId }), // Envoyer l'ID de la branche à supprimer
+        },
       );
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la suppression de la filière');
+      }
+
+      // Retourner une confirmation (optionnel)
+      return await response.json();
     },
-    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['users'] }), //refetch users after mutation, disabled for demo
+    // Mise à jour optimiste côté client
+    onMutate: (branchId: string) => {
+      // Annuler toute requête en cours pour ne pas avoir des données en conflit
+      queryClient.cancelQueries({ queryKey: ['branches'] });
+
+      // Sauvegarder les données actuelles dans le cache pour un rollback éventuel
+      const previousBranches = queryClient.getQueryData(['branches']);
+
+      // Optimistiquement mettre à jour le cache
+      queryClient.setQueryData(
+        ['branches'],
+        (prevBranches: any | undefined) => {
+          return prevBranches?.data?.filter(
+            (branch: Branch) => branch.id !== branchId,
+          );
+        },
+      );
+
+      // Retourner un contexte de rollback au cas où on aurait besoin d'annuler cette opération
+      return { previousBranches };
+    },
+    // Si la mutation échoue, restaurer les données précédentes
+    onError: (err, branchId, context: any) => {
+      if (context?.previousBranches) {
+        queryClient.setQueryData(['branches'], context.previousBranches);
+      }
+    },
+    // Rafraîchir les données après la suppression réussie
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['branches'] });
+    },
   });
 }
 
 const queryClient = new QueryClient();
 
-const BranchTable = ({ datas }: BranchTableProps) => (
+const BranchTable = () => (
   //Put this with your other react-query providers near root of your app
   <QueryClientProvider client={queryClient}>
-    <ModalsProvider>
-      <Section fakeData={datas} fakeDataWithLevel={datas} />
-    </ModalsProvider>
+    <Section />
   </QueryClientProvider>
 );
 
 export default BranchTable;
 
 const validateRequired = (value: string) => !!value.length;
-const validateRequiredNumber = (value: number) => !!value;
-const validateEmail = (email: string) =>
-  !!email.length &&
-  email
-    .toLowerCase()
-    .match(
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-    );
+const validateNumberRequired = (value: number) => !!value;
 
-function validateBranch(branch: BranchContext) {
+function validateBranch(branch: Branch) {
   return {
     name: !validateRequired(branch.name)
-      ? "L'intitulé de l'Université est requis"
+      ? "L'intitulé de la filière est requise"
       : '',
   };
 }

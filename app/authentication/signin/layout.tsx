@@ -1,6 +1,13 @@
 'use client';
 
-import { Center, Stack } from '@mantine/core';
+import {
+  Center,
+  Flex,
+  Grid,
+  Paper,
+  Stack,
+  useMantineColorScheme,
+} from '@mantine/core';
 import Image from 'next/image';
 import React, { ReactNode } from 'react';
 
@@ -9,6 +16,7 @@ type AuthProps = {
 };
 
 function SignInLayout({ children }: AuthProps) {
+  const { setColorScheme, colorScheme } = useMantineColorScheme();
   return (
     <Center
       style={{
@@ -16,18 +24,42 @@ function SignInLayout({ children }: AuthProps) {
         width: '100vw',
       }}
     >
-      <Stack>
-        <Center>
+      <Flex flex={1} align={'center'} justify={'center'} wrap={'wrap'}>
+        <Stack flex={1} align={'center'} justify={'center'}>
+          <Center>
+            <Image
+              src="/logo-no-background-colorfull.png"
+              alt="Syrap logo"
+              width={192}
+              height={96}
+              style={{ objectFit: 'contain' }}
+            />
+          </Center>
+          {children}
+        </Stack>
+        <Stack
+          flex={1}
+          align={'center'}
+          justify={'center'}
+          style={{
+            width: '100%', // Ensure the stack takes full width
+            height: '100vh', // Takes full viewport height
+            backgroundColor: colorScheme === 'dark' ? '#fff' : '#000', // Set background color to black
+          }}
+        >
           <Image
-            src="/logo-no-background-colorfull.png"
-            alt="Syrap logo"
-            width={192}
-            height={96}
-            style={{ objectFit: 'contain' }}
+            src={
+              colorScheme === 'dark'
+                ? '/thumbnail-cmr-l.jpg'
+                : '/thumbnail-cmr.jpg'
+            } // Replace with your image path or URL
+            alt="Your description"
+            width={650} // Set image width
+            height={650} // Set image height
+            style={{ objectFit: 'contain' }} // Optional: Ensure image fits within the bounds
           />
-        </Center>
-        {children}
-      </Stack>
+        </Stack>
+      </Flex>
     </Center>
   );
 }
