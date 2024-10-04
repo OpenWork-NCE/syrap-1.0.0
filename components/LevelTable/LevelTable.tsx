@@ -29,6 +29,7 @@ import {
   Menu,
 } from '@mantine/core';
 import {
+  IconCheck,
   IconDownload,
   IconEdit,
   IconFileTypeCsv,
@@ -50,6 +51,7 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { download, generateCsv, mkConfig } from 'export-to-csv';
 import { modals, ModalsProvider } from '@mantine/modals';
+import { notifications } from '@mantine/notifications';
 
 const csvConfig = mkConfig({
   fieldSeparator: ',',
@@ -105,7 +107,7 @@ const useGetLevels = ({
   // fetchURL.searchParams.set('sorting', JSON.stringify(sorting ?? []));
 
   return useQuery<LevelApiResponse>({
-    // queryKey: ['levels', fetchURL.href], //refetch whenever the URL changes (columnFilters, globalFilter, sorting, pagination)
+    // queryKey: ['level', fetchURL.href], //refetch whenever the URL changes (columnFilters, globalFilter, sorting, pagination)
     queryKey: ['levels'], //refetch whenever the URL changes (columnFilters, globalFilter, sorting, pagination)
     queryFn: () => fetch(fetchURL.href).then((res) => res.json()),
     placeholderData: keepPreviousData, //useful for paginated queries by keeping data from previous pages on screen while fetching the next page
@@ -151,7 +153,7 @@ const Section = () => {
       },
       {
         accessorKey: 'name',
-        header: 'Nom',
+        header: 'Intitulé',
         mantineEditTextInputProps: {
           type: 'text',
           required: true,
@@ -228,7 +230,6 @@ const Section = () => {
     table,
     row,
   }) => {
-    console.log('Au moins je suis ici : ', row, ' Voci les valeurs : ', values);
     const newValidationErrors = validateLevel(values);
     if (Object.values(newValidationErrors).some((error) => error)) {
       setValidationErrors(newValidationErrors);
@@ -358,15 +359,6 @@ const Section = () => {
               <span style={{ fontWeight: 'bolder' }}>{row.original.name}</span>
             </Text>
             <Divider my={10} />
-            {/*<Title order={5} mb={5}>*/}
-            {/*  Niveaux du niveau*/}
-            {/*</Title>*/}
-            {/*<LevelTable*/}
-            {/*  datas={*/}
-            {/*    fakeDataWithLevel.find((el) => el.id === row.original.id)*/}
-            {/*      ?.levels*/}
-            {/*  }*/}
-            {/*/>*/}
           </Box>
         </Box>
       </Box>
@@ -527,19 +519,27 @@ function useCreateLevel() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (level: Level) => {
-      // Envoie de la requête API pour créer une nouvelle levele
+      // Envoie de la requête API pour créer une nouveau niveau
       const response = await fetch('http://localhost:3000/api/levels/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(level), // Envoyer les informations de la nouvelle levele au serveur
+        body: JSON.stringify(level), // Envoyer les informations de la nouveau niveau au serveur
       });
 
       if (!response.ok) {
-        throw new Error('Erreur lors de la création du niveau');
+        throw new Error('Erreur lors de la création du Niveau');
       }
 
+      notifications.show({
+        color: 'teal',
+        title: 'Permission créee',
+        message: 'Merci de votre patience',
+        icon: <IconCheck />,
+        loading: false,
+        autoClose: 2000,
+      });
       // Retourner la réponse du serveur (optionnel)
       return await response.json();
     },
@@ -568,8 +568,7 @@ function useUpdateLevel() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (level: Level) => {
-      // Envoie de la requête API pour mettre a jour une nouvelle levele
-      console.log("Ici voici l'Id : ", level);
+      // Envoie de la requête API pour mettre a jour une nouveau niveau
       const response = await fetch(
         `http://localhost:3000/api/levels/${level.id}/update`,
         {
@@ -577,15 +576,22 @@ function useUpdateLevel() {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(level), // Envoyer les informations pour la modification de la levele
+          body: JSON.stringify(level), // Envoyer les informations pour la modification du niveau
         },
       );
 
       if (!response.ok) {
-        console.log('Voici la reponse : ', response);
-        throw new Error('Erreur lors de la mise à jour du niveau');
+        throw new Error('Erreur lors de la mise à jour du Niveau');
       }
 
+      notifications.show({
+        color: 'green',
+        title: 'Permission mise à jour',
+        message: 'Merci de votre patience',
+        icon: <IconCheck />,
+        loading: false,
+        autoClose: 2000,
+      });
       // Retourner la réponse du serveur (optionnel)
       return await response.json();
     },
@@ -611,7 +617,7 @@ function useDeleteLevel() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (levelId: string) => {
-      // Envoi de la requête API pour supprimer la levele
+      // Envoi de la requête API pour supprimer du niveau
       const response = await fetch(
         `http://localhost:3000/api/levels/${levelId}/delete`,
         {
@@ -623,12 +629,18 @@ function useDeleteLevel() {
         },
       );
 
-      console.log('Voici les informations pour le niveau : ', levelId);
-
       if (!response.ok) {
         throw new Error('Erreur lors de la suppression du niveau');
       }
 
+      notifications.show({
+        color: 'red',
+        title: 'Permission supprimée',
+        message: 'Merci de votre patience',
+        icon: <IconCheck />,
+        loading: false,
+        autoClose: 2000,
+      });
       // Retourner une confirmation (optionnel)
       return await response.json();
     },
@@ -663,27 +675,16 @@ function useDeleteLevel() {
 
 const queryClient = new QueryClient();
 
-const SectionWithReactQueryProvider = () => (
+const LevelTable = () => (
   //Put this with your other react-query providers near root of your app
   <QueryClientProvider client={queryClient}>
-    {/*<ModalsProvider>*/}
     <Section />
-    {/*</ModalsProvider>*/}
   </QueryClientProvider>
 );
 
-export default SectionWithReactQueryProvider;
+export default LevelTable;
 
 const validateRequired = (value: string) => !!value.length;
-const validateRequiredNumber = (value: number) => !!value;
-const validateEmail = (email: string) =>
-  !!email.length &&
-  email
-    .toLowerCase()
-    .match(
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-    );
-
 function validateLevel(level: Level) {
   return {
     // id: !validateRequiredNumber(Number(level.id)) ? 'Ce champs est requis' : '',

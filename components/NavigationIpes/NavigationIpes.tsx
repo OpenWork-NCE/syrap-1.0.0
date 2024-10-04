@@ -1,5 +1,6 @@
 import { ActionIcon, Box, Flex, Group, ScrollArea, Text } from '@mantine/core';
 import {
+  IconAffiliate,
   IconChartArea,
   IconChartBar,
   IconCross,
@@ -9,10 +10,12 @@ import {
   IconFileUpload,
   IconFolders,
   IconFolderShare,
+  IconFridge,
   IconGitCompare,
   IconMatchstick,
   IconNotebook,
   IconSchool,
+  IconUserCheck,
   IconUsers,
   IconUsersGroup,
   IconX,
@@ -30,6 +33,11 @@ const mockdata = [
     links: [
       { label: 'Accueil', icon: IconChartBar, link: PATH_BOARD.ipes },
       { label: 'UEs', icon: IconFolders, link: PATH_SECTIONS.ues },
+      {
+        label: 'Filières et Niveaux',
+        icon: IconFridge,
+        link: PATH_SECTIONS.branchNlevel,
+      },
       {
         label: 'Université de Tutelle',
         icon: IconNotebook,
@@ -53,12 +61,12 @@ const mockdata = [
       {
         label: 'Rapports',
         icon: IconFolderShare,
-        link: PATH_APPS.profile,
+        link: PATH_SECTIONS.reports,
       },
       {
         label: 'Logs',
         icon: IconChartArea,
-        link: PATH_APPS.settings,
+        link: PATH_SECTIONS.logs,
       },
     ],
   },

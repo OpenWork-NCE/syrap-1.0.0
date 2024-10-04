@@ -71,7 +71,7 @@ export default function Home() {
               </Stack>
             </Grid.Col>
             <Grid.Col span={{ base: 12, md: 6 }} order={{ base: 1, md: 2 }}>
-              <Image src={'/thumbnail-cmr.jpg'} alt="/" radius="md" />
+              <Image src={'./thumbnail.png'} alt="/" radius="md" />
             </Grid.Col>
           </Grid>
         </Box>

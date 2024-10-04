@@ -40,16 +40,6 @@ function Page() {
         <Stack gap="lg">
           <PageHeader title="Unitées d'Enseignement" breadcrumbItems={items} />
           <UesTable />
-          <Grid my={10}>
-            <Grid.Col span={{ base: 12, md: 6 }}>
-              <PageHeader title="Filières" />
-              <BranchTable />
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, md: 6 }}>
-              <PageHeader title="Niveaux" />
-              <LevelTable />
-            </Grid.Col>
-          </Grid>
         </Stack>
       </Container>
     </>

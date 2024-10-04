@@ -62,7 +62,7 @@ export async function POST(request: Request) {
       backendUrl(`/api/acteurs/universities`),
       {
         method: 'POST',
-        body: JSON.stringify(bodyPayload),
+        body: JSON.stringify(request.text()),
         headers: {
           'Content-Type': 'application/json',
           'x-user-ip': getClientIp(request),

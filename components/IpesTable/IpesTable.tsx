@@ -5,70 +5,57 @@ import '@mantine/dates/styles.css'; //if using mantine date picker features
 import 'mantine-react-table/styles.css'; //make sure MRT styles were imported in your app root (once)
 import { useMemo, useState } from 'react';
 import {
-  MRT_EditActionButtons,
   MantineReactTable,
-  // createRow,
-  type MRT_ColumnDef,
-  type MRT_Row,
-  type MRT_TableOptions,
   useMantineReactTable,
+  type MRT_ColumnDef,
+  type MRT_ColumnFiltersState,
+  type MRT_PaginationState,
+  type MRT_SortingState,
+  type MRT_ColumnFilterFnsState,
+  MRT_Row,
+  MRT_TableOptions,
+  MRT_EditActionButtons,
 } from 'mantine-react-table';
 import {
   ActionIcon,
-  Box,
-  Menu,
-  Button,
-  Flex,
-  Stack,
-  Text,
-  Title,
   Tooltip,
+  Text,
+  Stack,
+  Title,
+  Flex,
+  Box,
   Divider,
+  Button,
+  Menu,
+  Select,
+  TextInput,
 } from '@mantine/core';
-import { ModalsProvider, modals } from '@mantine/modals';
 import {
-  IconDetails,
   IconDownload,
   IconEdit,
   IconEye,
-  IconFileExport,
   IconFileTypeCsv,
   IconFileTypePdf,
+  IconMail,
   IconPlus,
+  IconRefresh,
   IconTableExport,
   IconTrash,
 } from '@tabler/icons-react';
 import {
   QueryClient,
   QueryClientProvider,
-  useMutation,
+  keepPreviousData,
   useQuery,
   useQueryClient,
+  useMutation,
 } from '@tanstack/react-query';
-import { fakeData, type IpesContext as Ipes } from './makeData';
-import { jsPDF } from 'jspdf'; //or use your library of choice here
+import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { mkConfig, generateCsv, download } from 'export-to-csv';
-import { useRouter } from 'next/navigation';
+import { download, generateCsv, mkConfig } from 'export-to-csv';
+import { modals, ModalsProvider } from '@mantine/modals';
 import { PATH_SECTIONS } from '@/routes';
-
-const mocksDatas: any = fakeData.map((fake) => {
-  return {
-    id: fake.id,
-    name: fake.name,
-    phone: fake.phone,
-    email: fake.email,
-    borough: fake.borough,
-    created_user: fake.created_user,
-    university: fake.university,
-    decret_of_creation: fake.decret_of_creation,
-    opening_stop: fake.opening_stop,
-    promoter: fake.promoter,
-    matching: fake.matching,
-    branch_count: fake.branch_count,
-    level_count: fake.level_count,
-  };
-});
+import { useRouter } from 'next/navigation';
 
 const csvConfig = mkConfig({
   fieldSeparator: ',',
@@ -76,11 +63,111 @@ const csvConfig = mkConfig({
   useKeysAsHeaders: true,
 });
 
+type Ipes = {
+  id: string;
+  name: string;
+  code?: string;
+  description?: string;
+  phone?: string;
+  email?: string;
+  arrondissement_id: string;
+  user_id?: string;
+  cenadi_id?: string;
+};
+
+type IpesApiResponse = {
+  data: Array<Ipes>;
+  messages: Array<string>;
+  success: string;
+};
+
+type Localization = {
+  id: string;
+  name: string;
+};
+
+type LocalizationApiResponse = {
+  data: Array<Localization>;
+  messages: Array<string>;
+  success: string;
+};
+
+interface Params {
+  columnFilterFns: MRT_ColumnFilterFnsState;
+  columnFilters: MRT_ColumnFiltersState;
+  globalFilter: string;
+  sorting: MRT_SortingState;
+  pagination: MRT_PaginationState;
+}
+
+//custom react-query hook
+const useGetIpeses = ({} // columnFilterFns,
+// columnFilters,
+// globalFilter,
+// sorting,
+// pagination,
+: Params) => {
+  //build the URL (https://www.mantine-react-table.com/api/data?start=0&size=10&filters=[]&globalFilter=&sorting=[])
+  const fetchURL = new URL(
+    '/api/ipeses',
+    process.env.NODE_ENV === 'production'
+      ? 'https://www.mantine-react-table.com'
+      : 'http://localhost:3000',
+  );
+  // fetchURL.searchParams.set(
+  //   'start',
+  //   `${pagination.pageIndex * pagination.pageSize}`,
+  // );
+  // fetchURL.searchParams.set('size', `${pagination.pageSize}`);
+  // fetchURL.searchParams.set('filters', JSON.stringify(columnFilters ?? []));
+  // fetchURL.searchParams.set(
+  //   'filterModes',
+  //   JSON.stringify(columnFilterFns ?? {}),
+  // );
+  // fetchURL.searchParams.set('globalFilter', globalFilter ?? '');
+  // fetchURL.searchParams.set('sorting', JSON.stringify(sorting ?? []));
+
+  return useQuery<IpesApiResponse>({
+    // queryKey: ['ipeses', fetchURL.href], //refetch whenever the URL changes (columnFilters, globalFilter, sorting, pagination)
+    queryKey: ['ipeses'], //refetch whenever the URL changes (columnFilters, globalFilter, sorting, pagination)
+    queryFn: () => fetch(fetchURL.href).then((res) => res.json()),
+    placeholderData: keepPreviousData, //useful for paginated queries by keeping data from previous pages on screen while fetching the next page
+    staleTime: 30_000, //don't refetch previously viewed pages until cache is more than 30 seconds old
+  });
+};
+
+const useGetLocalizations = () => {
+  //build the URL (https://www.mantine-react-table.com/api/data?start=0&size=10&filters=[]&globalFilter=&sorting=[])
+  const fetchURL = new URL(
+    '/api/boroughs',
+    process.env.NODE_ENV === 'production'
+      ? 'https://www.mantine-react-table.com'
+      : 'http://localhost:3000',
+  );
+
+  return useQuery<LocalizationApiResponse>({
+    queryKey: ['boroughs'], //refetch whenever the URL changes (columnFilters, globalFilter, sorting, pagination)
+    queryFn: () => fetch(fetchURL.href).then((res) => res.json()),
+    placeholderData: keepPreviousData, //useful for paginated queries by keeping data from previous pages on screen while fetching the next page
+    staleTime: 30_000, //don't refetch previously viewed pages until cache is more than 30 seconds old
+  });
+};
+
 const Section = () => {
   const { push } = useRouter();
   const [validationErrors, setValidationErrors] = useState<
     Record<string, string | undefined>
   >({});
+
+  const {
+    data: lData,
+    isError: lIsError,
+    isFetching: lIsFetching,
+    isLoading: lIsLoading,
+    refetch: lRefresh,
+  } = useGetLocalizations();
+
+  const fetchedLocalizations = lData?.data ?? [];
 
   const handleExportRows = (rows: MRT_Row<Ipes>[]) => {
     const doc = new jsPDF();
@@ -102,22 +189,32 @@ const Section = () => {
   };
 
   const handleExportDataAsCSV = () => {
-    const csv = generateCsv(csvConfig)(mocksDatas);
+    const csv = generateCsv(csvConfig)(fetchedIpeses);
     download(csvConfig)(csv);
   };
 
   const columns = useMemo<MRT_ColumnDef<Ipes>[]>(
     () => [
       {
-        accessorKey: 'id',
-        header: 'N°',
-        enableEditing: false,
-        size: 80,
+        accessorKey: 'code',
+        header: 'Sigle',
+
+        mantineEditTextInputProps: {
+          type: 'text',
+          required: true,
+          error: validationErrors?.code,
+          //remove any previous validation errors when user focuses on the input
+          onFocus: () =>
+            setValidationErrors({
+              ...validationErrors,
+              code: undefined,
+            }),
+          //optionally add validation checking for onBlur or onChange
+        },
       },
       {
         accessorKey: 'name',
-        header: 'IPES',
-
+        header: 'Ipes',
         mantineEditTextInputProps: {
           type: 'text',
           required: true,
@@ -132,61 +229,33 @@ const Section = () => {
         },
       },
       {
-        id: 'global_matching',
-        header: 'Université Tutelle',
-        columns: [
-          {
-            accessorKey: 'matching',
-            header: 'Score Matching',
-            size: 200,
-            filterVariant: 'range-slider',
-            enableEditing: false,
-            Edit: () => null,
-
-            mantineFilterRangeSliderProps: {
-              color: 'blue',
-
-              // label: (value) =>
-              //   value?.toLocaleString?.('fr-FR', {
-              //     minimumFractionDigits: 0,
-              //     maximumFractionDigits: 0,
-              //   }),
-            },
-            //custom conditional format and styling
-            Cell: ({ cell }) => (
-              <Box
-                style={(theme) => ({
-                  backgroundColor:
-                    cell.getValue<number>() < 40
-                      ? theme.colors.red[9]
-                      : cell.getValue<number>() >= 40 &&
-                          cell.getValue<number>() < 65
-                        ? theme.colors.yellow[9]
-                        : theme.colors.green[9],
-                  borderRadius: '4px',
-                  color: '#fff',
-                  maxWidth: '9ch',
-                  padding: '4px',
-                  textAlign: 'center',
-                })}
-              >
-                {cell.getValue<number>()?.toLocaleString?.('fr-FR', {
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0,
-                })}
-                %
-              </Box>
-            ),
-          },
-        ],
+        accessorKey: 'description',
+        header: 'Description',
+        mantineEditTextInputProps: {
+          type: 'text',
+          required: true,
+          error: validationErrors?.name,
+          //remove any previous validation errors when user focuses on the input
+          onFocus: () =>
+            setValidationErrors({
+              ...validationErrors,
+              name: undefined,
+            }),
+          //optionally add validation checking for onBlur or onChange
+        },
       },
+      // {
+      //   accessorKey: 'ipes_count',
+      //   header: 'Nbre IPES sous tutelle',
+      //   Edit: () => null,
+      //   enableHiding: true,
+      // },
       {
         accessorKey: 'phone',
         header: 'Téléphone',
         enableHiding: true,
         mantineEditTextInputProps: {
           type: 'tel',
-          required: true,
           error: validationErrors?.phone,
           //remove any previous validation errors when user focuses on the input
           onFocus: () =>
@@ -201,7 +270,6 @@ const Section = () => {
         header: 'Email',
         mantineEditTextInputProps: {
           type: 'email',
-          required: true,
           error: validationErrors?.email,
           //remove any previous validation errors when user focuses on the input
           onFocus: () =>
@@ -212,101 +280,53 @@ const Section = () => {
         },
       },
       {
-        accessorKey: 'borough',
-        header: 'Adresse',
-        mantineEditTextInputProps: {
-          type: 'text',
-          required: true,
-          error: validationErrors?.borough,
-          //remove any previous validation errors when ipes focuses on the input
-          onFocus: () =>
-            setValidationErrors({
-              ...validationErrors,
-              borough: undefined,
-            }),
-          //optionally add validation checking for onBlur or onChange
+        accessorKey: 'localization',
+        header: 'Localisation',
+        editVariant: 'select',
+        mantineEditSelectProps: {
+          data: fetchedLocalizations.map((localization) => ({
+            value: localization.id,
+            label: localization.name,
+          })),
         },
-      },
-      {
-        accessorKey: 'created_user',
-        header: 'Créé par',
-        Edit: () => null,
-        mantineEditTextInputProps: {
-          type: 'text',
-          required: true,
-          error: validationErrors?.created_user,
-          //remove any previous validation errors when ipes focuses on the input
-          onFocus: () =>
-            setValidationErrors({
-              ...validationErrors,
-              created_user: undefined,
-            }),
-          //optionally add validation checking for onBlur or onChange
-        },
-      },
-      {
-        accessorKey: 'university',
-        header: 'Université Tutelle',
-        mantineEditTextInputProps: {
-          type: 'text',
-          required: true,
-          error: validationErrors?.university,
-          //remove any previous validation errors when ipes focuses on the input
-          onFocus: () =>
-            setValidationErrors({
-              ...validationErrors,
-              university: undefined,
-            }),
-          //optionally add validation checking for onBlur or onChange
-        },
-      },
-      {
-        accessorKey: 'decret_of_creation',
-        header: 'Décrêt de creation',
-        mantineEditTextInputProps: {
-          type: 'file',
-          required: false,
-          error: validationErrors?.decret_of_create,
-          //remove any previous validation errors when ipes focuses on the input
-          onFocus: () =>
-            setValidationErrors({
-              ...validationErrors,
-              decret_of_create: undefined,
-            }),
-          //optionally add validation checking for onBlur or onChange
-        },
-      },
-      {
-        accessorKey: 'opening_stop',
-        header: 'Arreté de creation',
-        mantineEditTextInputProps: {
-          type: 'file',
-          required: false,
-          error: validationErrors?.opening_stop,
-          //remove any previous validation errors when ipes focuses on the input
-          onFocus: () =>
-            setValidationErrors({
-              ...validationErrors,
-              opening_stop: undefined,
-            }),
-          //optionally add validation checking for onBlur or onChange
-        },
-      },
-      {
-        accessorKey: 'promoter',
-        header: 'Recteur',
-        mantineEditTextInputProps: {
-          type: 'text',
-          required: true,
-          error: validationErrors?.promoter,
-          //remove any previous validation errors when ipes focuses on the input
-          onFocus: () =>
-            setValidationErrors({
-              ...validationErrors,
-              promoter: undefined,
-            }),
-          //optionally add validation checking for onBlur or onChange
-        },
+        // Cell: (props) => {
+        //   const { row, cell, table, column } = props;
+        //   const [selectedLocalization, setSelectedLocalization] = useState(
+        //     cell.getValue() as string,
+        //   );
+        //
+        //   // Find the corresponding arrondissement name based on the ID
+        //   const selectedName = fetchedLocalizations.find(
+        //     (localization) => localization.id === selectedLocalization,
+        //   )?.name;
+        //   return (
+        //     <Select
+        //       data={fetchedLocalizations.map((localization) => ({
+        //         value: localization.id,
+        //         label: localization.name,
+        //       }))}
+        //       value={selectedLocalization}
+        //       onChange={(value) => {
+        //         // Update the selected value (arrondissementId)
+        //         setSelectedLocalization(value as string);
+        //
+        //         // Optional: Handle this change to update the table row data
+        //         // Example: Update the row data in your state or pass the value to a handler
+        //       }}
+        //     />
+        //   );
+        // },
+        // mantineEditTextInputProps: {
+        //   type: 'text',
+        //   required: true,
+        //   error: validationErrors?.localization,
+        //   //remove any previous validation errors when user focuses on the input
+        //   onFocus: () =>
+        //     setValidationErrors({
+        //       ...validationErrors,
+        //       localization: undefined,
+        //     }),
+        // },
       },
       // {
       //   accessorKey: 'state',
@@ -321,16 +341,40 @@ const Section = () => {
     [validationErrors],
   );
 
+  //Manage MRT state that we want to pass to our API
+  const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>(
+    [],
+  );
+  const [columnFilterFns, setColumnFilterFns] = //filter modes
+    useState<MRT_ColumnFilterFnsState>(
+      Object.fromEntries(
+        columns.map(({ accessorKey }) => [accessorKey, 'contains']),
+      ),
+    ); //default to "contains" for all columns
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [sorting, setSorting] = useState<MRT_SortingState>([]);
+  const [pagination, setPagination] = useState<MRT_PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+
+  //call our custom react-query hook
+  const { data, isError, isFetching, isLoading, refetch } = useGetIpeses({
+    columnFilterFns,
+    columnFilters,
+    globalFilter,
+    pagination,
+    sorting,
+  });
+
+  //this will depend on your API response shape
+  const fetchedIpeses = data?.data ?? [];
+  console.log('Voici les arrondissements : ', fetchedLocalizations);
+  // const totalRowCount = data?.meta?.totalRowCount ?? 0;
+
   //call CREATE hook
   const { mutateAsync: createIpes, isPending: isCreatingIpes } =
     useCreateIpes();
-  //call READ hook
-  const {
-    data: fetchedIpeses = [],
-    isError: isLoadingIpesError,
-    isFetching: isFetchingIpes,
-    isLoading: isLoadingIpes,
-  } = useGetIpeses();
   //call UPDATE hook
   const { mutateAsync: updateIpes, isPending: isUpdatingIpes } =
     useUpdateIpes();
@@ -343,6 +387,7 @@ const Section = () => {
     values,
     exitCreatingMode,
   }) => {
+    console.log("VOici l'ipes : ", values);
     const newValidationErrors = validateIpes(values);
     if (Object.values(newValidationErrors).some((error) => error)) {
       setValidationErrors(newValidationErrors);
@@ -357,6 +402,7 @@ const Section = () => {
   const handleSaveIpes: MRT_TableOptions<Ipes>['onEditingRowSave'] = async ({
     values,
     table,
+    row,
   }) => {
     const newValidationErrors = validateIpes(values);
     if (Object.values(newValidationErrors).some((error) => error)) {
@@ -364,14 +410,23 @@ const Section = () => {
       return;
     }
     setValidationErrors({});
-    await updateIpes(values);
+    await updateIpes({
+      id: row.id,
+      code: values.code,
+      name: values.name,
+      phone: values.phone,
+      email: values.email,
+      arrondissement_id: values.localization,
+      cenadi_id: values.cenadi_id,
+      user_id: values.user_id,
+    });
     table.setEditingRow(null); //exit editing mode
   };
 
   //DELETE action
   const openDeleteConfirmModal = (row: MRT_Row<Ipes>) =>
     modals.openConfirmModal({
-      title: 'Etes vous sur de vouloir supprimer cette IPES ?',
+      title: 'Etes vous sur de vouloir supprimer cette Ipes ?',
       children: (
         <Text>
           Etes vous sure de vouloir supprimer {row.original.name}? Cette action
@@ -407,11 +462,6 @@ const Section = () => {
       density: 'xs',
       columnVisibility: {
         id: false,
-        created_user: false,
-        phone: false,
-        email: false,
-        decret_of_creation: false,
-        opening_stop: false,
       },
       columnPinning: {
         left: ['mrt-row-select'],
@@ -419,18 +469,17 @@ const Section = () => {
       },
       pagination: {
         pageIndex: 0,
-        pageSize: 20,
+        pageSize: 10,
       },
     },
-
     mantineSearchTextInputProps: {
-      placeholder: 'Rechercher des IPESs',
+      placeholder: 'Rechercher des Ipess',
     },
     // renderTopToolbarCustomActions: ({ table }) => (
     //
     // ),
     getRowId: (row) => row.id,
-    mantineToolbarAlertBannerProps: isLoadingIpesError
+    mantineToolbarAlertBannerProps: isError
       ? {
           color: 'red',
           children: 'Erreur de chargement des données',
@@ -438,53 +487,37 @@ const Section = () => {
       : undefined,
     mantineTableContainerProps: {
       style: {
-        minHeight: '500px',
+        minHeight: 'auto',
       },
     },
     onCreatingRowCancel: () => setValidationErrors({}),
     onCreatingRowSave: handleCreateIpes,
     onEditingRowCancel: () => setValidationErrors({}),
     onEditingRowSave: handleSaveIpes,
+
+    onColumnFilterFnsChange: setColumnFilterFns,
+    onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
+    onPaginationChange: setPagination,
+    onSortingChange: setSorting,
     renderCreateRowModalContent: ({ table, row, internalEditComponents }) => (
       <Stack>
-        <Title order={3}>Nouvel IPES</Title>
+        <Title order={3}>Nouvel Ipes</Title>
         {internalEditComponents}
         <Flex justify="flex-end" mt="xl">
-          <MRT_EditActionButtons variant="text" table={table} row={row} />
+          <MRT_EditActionButtons variant={'text'} table={table} row={row} />
         </Flex>
       </Stack>
     ),
     renderEditRowModalContent: ({ table, row, internalEditComponents }) => (
       <Stack>
-        <Title order={3}>Editer l'IPES</Title>
+        <Title order={3}>Editer l'Ipes</Title>
         {internalEditComponents}
         <Flex justify="flex-end" mt="xl">
           <MRT_EditActionButtons variant="text" table={table} row={row} />
         </Flex>
       </Stack>
     ),
-    // renderRowActionMenuItems: ({ row, table }) => (
-    //   <>
-    //     <Menu.Item
-    //       onClick={() => table.setEditingRow(row)}
-    //       leftSection={<IconDetails />}
-    //     >
-    //       Details
-    //     </Menu.Item>
-    //     <Menu.Item
-    //       onClick={() => table.setEditingRow(row)}
-    //       leftSection={<IconEdit />}
-    //     >
-    //       Editer
-    //     </Menu.Item>
-    //     <Menu.Item
-    //       onClick={() => openDeleteConfirmModal(row)}
-    //       leftSection={<IconTrash />}
-    //     >
-    //       Supprimer
-    //     </Menu.Item>
-    //   </>
-    // ),
 
     renderDetailPanel: ({ row }) => (
       <Box
@@ -503,11 +536,7 @@ const Section = () => {
           </Title>
           <Box style={{ fontSize: '16px' }}>
             <Text size={'sm'}>
-              Identifiant Unique :{' '}
-              <span style={{ fontWeight: 'bolder' }}>{row.original.id}</span>
-            </Text>
-            <Text size={'sm'}>
-              Intitulé de l'IPES :{' '}
+              Intitulé de l'Ipes :{' '}
               <span style={{ fontWeight: 'bolder' }}>{row.original.name}</span>
             </Text>
             <Text size={'sm'}>
@@ -518,45 +547,33 @@ const Section = () => {
               Email :{' '}
               <span style={{ fontWeight: 'bolder' }}>{row.original.email}</span>
             </Text>
-            <Text size={'sm'}>
-              Créé par :{' '}
-              <span style={{ fontWeight: 'bolder' }}>
-                {row.original.created_user}
-              </span>
-            </Text>
-            <Text size={'sm'}>
-              Addresse :{' '}
-              <span style={{ fontWeight: 'bolder' }}>
-                {row.original.borough}
-              </span>
-            </Text>
-            <Text size={'sm'}>
-              Université de tutelle :{' '}
-              <span style={{ fontWeight: 'bolder' }}>
-                {row.original.university}
-              </span>
-            </Text>
-            <Text size={'sm'}>
-              Promoteur :{' '}
-              <span style={{ fontWeight: 'bolder' }}>
-                {row.original.promoter}
-              </span>
-            </Text>
-            <Text size={'sm'}>
-              Matching Global avec l'université de tutelle :{' '}
-              <span style={{ fontWeight: 'bolder' }}>
-                {row.original.matching}%
-              </span>
-            </Text>
+            {/*<Text size={'sm'}>*/}
+            {/*  Nombre d'IPES sous tutelle :{' '}*/}
+            {/*  <span style={{ fontWeight: 'bolder' }}>*/}
+            {/*    {row.original.ipes_count}*/}
+            {/*  </span>*/}
+            {/*</Text>*/}
+            {/*<Text size={'sm'}>*/}
+            {/*  Nombre de filières :{' '}*/}
+            {/*  <span style={{ fontWeight: 'bolder' }}>*/}
+            {/*    {row.original.branch_count}*/}
+            {/*  </span>*/}
+            {/*</Text>*/}
+            {/*<Text size={'sm'}>*/}
+            {/*  Nombre de ipess :{' '}*/}
+            {/*  <span style={{ fontWeight: 'bolder' }}>*/}
+            {/*    {row.original.level_count}*/}
+            {/*  </span>*/}
+            {/*</Text>*/}
             <Divider pb={1} mb={10} />
-            <Button
-              leftSection={<IconEye />}
-              onClick={() => {
-                push(PATH_SECTIONS.ipes.ipes_details(row.original.id));
-              }}
-            >
-              Details
-            </Button>
+            {/*<Button*/}
+            {/*  leftSection={<IconEye />}*/}
+            {/*  onClick={() => {*/}
+            {/*    push(PATH_SECTIONS.ipeses.ipes_details(row.original.id));*/}
+            {/*  }}*/}
+            {/*>*/}
+            {/*  Details*/}
+            {/*</Button>*/}
           </Box>
         </Box>
       </Box>
@@ -564,11 +581,6 @@ const Section = () => {
 
     renderRowActions: ({ row, table }) => (
       <Flex gap="md">
-        {/*<Tooltip label="Details">*/}
-        {/*  <ActionIcon onClick={() => table.setEditingRow(row)}>*/}
-        {/*    <IconDetails />*/}
-        {/*  </ActionIcon>*/}
-        {/*</Tooltip>*/}
         <Tooltip label="Editer">
           <ActionIcon color={'green'} onClick={() => table.setEditingRow(row)}>
             <IconEdit />
@@ -584,7 +596,12 @@ const Section = () => {
 
     renderTopToolbarCustomActions: ({ table }) => (
       <>
-        <Flex gap={4} justify={'flex-end'}>
+        <Flex gap={4} justify={'flex-end'} align={'center'}>
+          <Tooltip label="Rafraichir des données">
+            <ActionIcon onClick={() => refetch()}>
+              <IconRefresh />
+            </ActionIcon>
+          </Tooltip>
           <Button
             onClick={() => {
               table.setCreatingRow(true); //simplest way to open the create row modal with no default values
@@ -597,7 +614,7 @@ const Section = () => {
             }}
             leftSection={<IconPlus />}
           >
-            Nouvelle Ipes
+            Nouvel Ipes
           </Button>
           <Menu
             shadow={'md'}
@@ -694,98 +711,160 @@ const Section = () => {
         </Flex>
       </>
     ),
+    // onRowSelectionChange: setRowSelection,
+    // rowCount: totalRowCount,
     state: {
-      isLoading: isLoadingIpes,
+      columnFilterFns,
+      columnFilters,
+      globalFilter,
+      isLoading: isLoading,
       isSaving: isCreatingIpes || isUpdatingIpes || isDeletingIpes,
-      showAlertBanner: isLoadingIpesError,
-      showProgressBars: isFetchingIpes,
+      showAlertBanner: isError,
+      showProgressBars: isFetching,
+      pagination,
+      sorting,
     },
   });
 
   return <MantineReactTable table={table} />;
 };
 
-//CREATE hook (post new user to api)
+//CREATE hook (post new ipes to api)
 function useCreateIpes() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (user: Ipes) => {
-      //send api update request here
-      await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
-      return Promise.resolve();
+    mutationFn: async (ipes: Ipes) => {
+      // Envoie de la requête API pour créer une nouvelle ipese
+      const response = await fetch('http://localhost:3000/api/ipeses/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(ipes), // Envoyer les informations de la nouvelle ipese au serveur
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors de la création de l'ipes");
+      }
+
+      // Retourner la réponse du serveur (optionnel)
+      return await response.json();
     },
     //client side optimistic update
     onMutate: (newIpesInfo: Ipes) => {
-      queryClient.setQueryData(
-        ['ipeses'],
-        (prevIpeses: any) =>
-          [
-            ...prevIpeses,
-            {
-              ...newIpesInfo,
-              id: (Math.random() + 1).toString(36).substring(7),
-            },
-          ] as Ipes[],
-      );
+      queryClient.setQueryData(['ipeses'], (prevIpeses: any) => {
+        // Vérifier si prevIpeses est un tableau, sinon, initialisez-le comme un tableau vide
+        const ipesList = Array.isArray(prevIpeses) ? prevIpeses : [];
+        return [
+          ...ipesList,
+          {
+            ...newIpesInfo,
+            id: (Math.random() + 1).toString(36).substring(7), // Créer un ID temporaire
+          },
+        ] as Ipes[];
+      });
     },
-    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['ipeses'] }), //refetch ipeses after mutation, disabled for demo
+    // Rafraîchissement des données après la mutation
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['ipeses'] });
+    },
   });
 }
-
-//READ hook (get ipeses from api)
-function useGetIpeses() {
-  return useQuery<Ipes[]>({
-    queryKey: ['ipeses'],
-    queryFn: async () => {
-      //send api request here
-      await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
-      return Promise.resolve(fakeData);
-    },
-    refetchOnWindowFocus: false,
-  });
-}
-
-//UPDATE hook (put user in api)
+//UPDATE hook (put ipes in api)
 function useUpdateIpes() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (user: Ipes) => {
-      //send api update request here
-      await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
-      return Promise.resolve();
+    mutationFn: async (ipes: Ipes) => {
+      // Envoie de la requête API pour mettre a jour une nouvelle ipese
+      console.log("Ici voici l'Id : ", ipes);
+      const response = await fetch(
+        `http://localhost:3000/api/ipeses/${ipes.id}/update`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(ipes), // Envoyer les informations pour la modification de la ipese
+        },
+      );
+
+      if (!response.ok) {
+        console.log('Voici la reponse : ', response);
+        throw new Error("Erreur lors de la mise à jour de l'ipes");
+      }
+
+      // Retourner la réponse du serveur (optionnel)
+      return await response.json();
     },
     //client side optimistic update
     onMutate: (newIpesInfo: Ipes) => {
-      queryClient.setQueryData(
-        ['ipeses'],
-        (prevIpeses: any) =>
-          prevIpeses?.map((prevIpes: Ipes) =>
-            prevIpes.id === newIpesInfo.id ? newIpesInfo : prevIpes,
-          ),
-      );
+      queryClient.setQueryData(['ipeses'], (prevIpeses: any) => {
+        const ipesList = Array.isArray(prevIpeses) ? prevIpeses : [];
+
+        return ipesList.map((ipes: Ipes) =>
+          ipes.id === newIpesInfo.id ? { ...ipes, ...newIpesInfo } : ipes,
+        );
+      });
     },
-    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['ipeses'] }), //refetch ipeses after mutation, disabled for demo
+    // Invalider le cache après la mutation pour obtenir les données actualisées
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['ipeses'] });
+    },
   });
 }
 
-//DELETE hook (delete user in api)
+//DELETE hook (delete ipes in api)
 function useDeleteIpes() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (ueId: string) => {
-      //send api update request here
-      await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
-      return Promise.resolve();
-    },
-    //client side optimistic update
-    onMutate: (userId: string) => {
-      queryClient.setQueryData(
-        ['ipeses'],
-        (prevIpeses: any) =>
-          prevIpeses?.filter((user: Ipes) => user.id !== userId),
+    mutationFn: async (ipesId: string) => {
+      // Envoi de la requête API pour supprimer la ipese
+      const response = await fetch(
+        `http://localhost:3000/api/ipeses/${ipesId}/delete`,
+        {
+          method: 'DELETE', // DELETE pour signifier la suppression
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ id: ipesId }), // Envoyer l'ID du ipes à supprimer
+        },
       );
+
+      console.log('Voici les informations pour le ipes : ', ipesId);
+
+      if (!response.ok) {
+        throw new Error("Erreur lors de la suppression de l'ipes");
+      }
+
+      // Retourner une confirmation (optionnel)
+      return await response.json();
     },
-    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['ipeses'] }), //refetch ipeses after mutation, disabled for demo
+    // Mise à jour optimiste côté client
+    onMutate: (ipesId: string) => {
+      // Annuler toute requête en cours pour ne pas avoir des données en conflit
+      queryClient.cancelQueries({ queryKey: ['ipeses'] });
+
+      // Sauvegarder les données actuelles dans le cache pour un rollback éventuel
+      const previousIpeses = queryClient.getQueryData(['ipeses']);
+
+      // Optimistiquement mettre à jour le cache
+      queryClient.setQueryData(['ipeses'], (prevIpeses: any | undefined) => {
+        return prevIpeses?.data?.filter((ipes: Ipes) => ipes.id !== ipesId);
+      });
+
+      // Retourner un contexte de rollback au cas où on aurait besoin d'annuler cette opération
+      return { previousIpeses };
+    },
+    // Si la mutation échoue, restaurer les données précédentes
+    onError: (err, ipesId, context: any) => {
+      if (context?.previousIpeses) {
+        queryClient.setQueryData(['ipeses'], context.previousIpeses);
+      }
+    },
+    // Rafraîchir les données après la suppression réussie
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['ipeses'] });
+    },
   });
 }
 
@@ -794,16 +873,13 @@ const queryClient = new QueryClient();
 const IpesTable = () => (
   //Put this with your other react-query providers near root of your app
   <QueryClientProvider client={queryClient}>
-    <ModalsProvider>
-      <Section />
-    </ModalsProvider>
+    <Section />
   </QueryClientProvider>
 );
 
 export default IpesTable;
 
 const validateRequired = (value: string) => !!value.length;
-const validateRequiredNumber = (value: number) => !!value;
 const validateEmail = (email: string) =>
   !!email.length &&
   email
@@ -814,12 +890,20 @@ const validateEmail = (email: string) =>
 
 function validateIpes(ipeses: Ipes) {
   return {
-    name: !validateRequired(ipeses.name) ? "Intitulé de l'IPES requis" : '',
-    phone: !validateRequired(ipeses.phone) ? 'Téléphone requis' : '',
-    email: !validateEmail(ipeses.email) ? 'Format Email incorrect' : '',
-    borough: !validateRequired(ipeses.borough) ? 'Adresse requise' : '',
-    creator_user: !validateRequired(ipeses.created_user) ? 'Requis' : '',
-    university: !validateRequired(ipeses.university) ? 'Requis' : '',
-    promoter: !validateRequired(ipeses.promoter) ? 'Requis' : '',
+    // code: !validateRequired(ipeses.code)
+    //   ? "L'intitulé de l'Ipes est requis"
+    //   : '',
+    name: !validateRequired(ipeses.name)
+      ? "L'intitulé de l'Ipes est requis"
+      : '',
+    // phone: !validateRequired(ipeses.phone)
+    //   ? "Le nombre d'heures est requis : "
+    //   : '',
+    // email: !validateEmail(ipeses.email)
+    //   ? "L'intitulé de l'Ipes est requis"
+    //   : '',
+    // localization: !validateRequired(ipeses.localization)
+    //   ? "Le nombre d'heures est requis : "
+    //   : '',
   };
 }

@@ -1,7 +1,7 @@
 import { ActionIcon, createTheme, Loader } from '@mantine/core';
 
 export const myTheme = createTheme({
-  primaryColor: 'red',
+  primaryColor: 'orange',
   defaultRadius: 'md',
   focusRing: 'always',
   fontFamily: 'EB_Garamond, sans-serif',

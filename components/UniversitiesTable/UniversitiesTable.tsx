@@ -27,6 +27,8 @@ import {
   Divider,
   Button,
   Menu,
+  Select,
+  TextInput,
 } from '@mantine/core';
 import {
   IconDownload,
@@ -34,6 +36,7 @@ import {
   IconEye,
   IconFileTypeCsv,
   IconFileTypePdf,
+  IconMail,
   IconPlus,
   IconRefresh,
   IconTableExport,
@@ -64,6 +67,7 @@ type University = {
   id: string;
   name: string;
   code?: string;
+  description?: string;
   phone?: string;
   email?: string;
   arrondissement_id: string;
@@ -77,6 +81,17 @@ type UniversityApiResponse = {
   success: string;
 };
 
+type Localization = {
+  id: string;
+  name: string;
+};
+
+type LocalizationApiResponse = {
+  data: Array<Localization>;
+  messages: Array<string>;
+  success: string;
+};
+
 interface Params {
   columnFilterFns: MRT_ColumnFilterFnsState;
   columnFilters: MRT_ColumnFiltersState;
@@ -86,13 +101,12 @@ interface Params {
 }
 
 //custom react-query hook
-const useGetUniversities = ({
-  columnFilterFns,
-  columnFilters,
-  globalFilter,
-  sorting,
-  pagination,
-}: Params) => {
+const useGetUniversities = ({} // columnFilterFns,
+// columnFilters,
+// globalFilter,
+// sorting,
+// pagination,
+: Params) => {
   //build the URL (https://www.mantine-react-table.com/api/data?start=0&size=10&filters=[]&globalFilter=&sorting=[])
   const fetchURL = new URL(
     '/api/universities',
@@ -122,11 +136,38 @@ const useGetUniversities = ({
   });
 };
 
+const useGetLocalizations = () => {
+  //build the URL (https://www.mantine-react-table.com/api/data?start=0&size=10&filters=[]&globalFilter=&sorting=[])
+  const fetchURL = new URL(
+    '/api/boroughs',
+    process.env.NODE_ENV === 'production'
+      ? 'https://www.mantine-react-table.com'
+      : 'http://localhost:3000',
+  );
+
+  return useQuery<LocalizationApiResponse>({
+    queryKey: ['boroughs'], //refetch whenever the URL changes (columnFilters, globalFilter, sorting, pagination)
+    queryFn: () => fetch(fetchURL.href).then((res) => res.json()),
+    placeholderData: keepPreviousData, //useful for paginated queries by keeping data from previous pages on screen while fetching the next page
+    staleTime: 30_000, //don't refetch previously viewed pages until cache is more than 30 seconds old
+  });
+};
+
 const Section = () => {
   const { push } = useRouter();
   const [validationErrors, setValidationErrors] = useState<
     Record<string, string | undefined>
   >({});
+
+  const {
+    data: lData,
+    isError: lIsError,
+    isFetching: lIsFetching,
+    isLoading: lIsLoading,
+    refetch: lRefresh,
+  } = useGetLocalizations();
+
+  const fetchedLocalizations = lData?.data ?? [];
 
   const handleExportRows = (rows: MRT_Row<University>[]) => {
     const doc = new jsPDF();
@@ -174,7 +215,22 @@ const Section = () => {
       {
         accessorKey: 'name',
         header: 'Université',
-
+        mantineEditTextInputProps: {
+          type: 'text',
+          required: true,
+          error: validationErrors?.name,
+          //remove any previous validation errors when user focuses on the input
+          onFocus: () =>
+            setValidationErrors({
+              ...validationErrors,
+              name: undefined,
+            }),
+          //optionally add validation checking for onBlur or onChange
+        },
+      },
+      {
+        accessorKey: 'description',
+        header: 'Description',
         mantineEditTextInputProps: {
           type: 'text',
           required: true,
@@ -226,17 +282,51 @@ const Section = () => {
       {
         accessorKey: 'localization',
         header: 'Localisation',
-        mantineEditTextInputProps: {
-          type: 'text',
-          required: true,
-          error: validationErrors?.localization,
-          //remove any previous validation errors when user focuses on the input
-          onFocus: () =>
-            setValidationErrors({
-              ...validationErrors,
-              localization: undefined,
-            }),
+        editVariant: 'select',
+        mantineEditSelectProps: {
+          data: fetchedLocalizations.map((localization) => ({
+            value: localization.id,
+            label: localization.name,
+          })),
         },
+        // Cell: (props) => {
+        //   const { row, cell, table, column } = props;
+        //   const [selectedLocalization, setSelectedLocalization] = useState(
+        //     cell.getValue() as string,
+        //   );
+        //
+        //   // Find the corresponding arrondissement name based on the ID
+        //   const selectedName = fetchedLocalizations.find(
+        //     (localization) => localization.id === selectedLocalization,
+        //   )?.name;
+        //   return (
+        //     <Select
+        //       data={fetchedLocalizations.map((localization) => ({
+        //         value: localization.id,
+        //         label: localization.name,
+        //       }))}
+        //       value={selectedLocalization}
+        //       onChange={(value) => {
+        //         // Update the selected value (arrondissementId)
+        //         setSelectedLocalization(value as string);
+        //
+        //         // Optional: Handle this change to update the table row data
+        //         // Example: Update the row data in your state or pass the value to a handler
+        //       }}
+        //     />
+        //   );
+        // },
+        // mantineEditTextInputProps: {
+        //   type: 'text',
+        //   required: true,
+        //   error: validationErrors?.localization,
+        //   //remove any previous validation errors when user focuses on the input
+        //   onFocus: () =>
+        //     setValidationErrors({
+        //       ...validationErrors,
+        //       localization: undefined,
+        //     }),
+        // },
       },
       // {
       //   accessorKey: 'state',
@@ -279,6 +369,7 @@ const Section = () => {
 
   //this will depend on your API response shape
   const fetchedUniversities = data?.data ?? [];
+  console.log('Voici les arrondissements : ', fetchedLocalizations);
   // const totalRowCount = data?.meta?.totalRowCount ?? 0;
 
   //call CREATE hook
@@ -300,6 +391,7 @@ const Section = () => {
         return;
       }
       setValidationErrors({});
+      console.log("VOici l'université : ", values);
       await createUniversity(values);
       exitCreatingMode();
     };
@@ -408,7 +500,7 @@ const Section = () => {
         <Title order={3}>Nouvelle Université</Title>
         {internalEditComponents}
         <Flex justify="flex-end" mt="xl">
-          <MRT_EditActionButtons variant="text" table={table} row={row} />
+          <MRT_EditActionButtons variant={'text'} table={table} row={row} />
         </Flex>
       </Stack>
     ),

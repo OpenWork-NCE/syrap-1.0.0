@@ -14,6 +14,7 @@ import { PATH_BOARD, PATH_DASHBOARD } from '@/routes';
 import { PageHeader, UniversitiesTable } from '@/components';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { useFetchData } from '@/hooks';
+import LogTable from '@/components/LogsTable/LogsTable';
 
 const items = [
   { title: 'Cenadi', href: PATH_BOARD.cenadi },
@@ -46,6 +47,7 @@ function Page() {
       <Container fluid>
         <Stack gap="lg">
           <PageHeader title="Logs de l'application" breadcrumbItems={items} />
+          <LogTable />
         </Stack>
       </Container>
     </>

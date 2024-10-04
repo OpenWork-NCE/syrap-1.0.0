@@ -46,8 +46,7 @@ function Page() {
       <Container fluid>
         <Stack gap="lg">
           <PageHeader title="Utilisateurs" breadcrumbItems={items} />
-          {/*<UsersTable />*/}
-          <BranchTable />
+          <UsersTable />
         </Stack>
       </Container>
     </>

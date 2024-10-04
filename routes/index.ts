@@ -23,8 +23,10 @@ const ROOTS_IPES = '/ipes';
 export const PATH_SECTIONS = {
   root: ROOT_SECTIONS,
   ues: path(ROOT_SECTIONS, '/ues/list'),
+  branchNlevel: path(ROOT_SECTIONS, '/branchNlevel'),
   users: path(ROOT_SECTIONS, '/users'),
-  authorizations: path(ROOT_SECTIONS, '/roles'),
+  profiles: path(ROOT_SECTIONS, '/profiles'),
+  authorizations: path(ROOT_SECTIONS, '/authorizations'),
   universities: {
     all: path(ROOT_SECTIONS, ROOTS_UNIVERSITIES + '/'),
     syllabus: path(ROOT_SECTIONS, ROOTS_UNIVERSITIES + `/syllabus`),

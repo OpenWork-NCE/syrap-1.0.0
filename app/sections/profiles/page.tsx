@@ -10,13 +10,8 @@ import {
   Stack,
   Text,
 } from '@mantine/core';
-import { PATH_BOARD, PATH_DASHBOARD } from '@/routes';
-import {
-  AuthorizationsTable,
-  IpesTable,
-  PageHeader,
-  UniversitiesTable,
-} from '@/components';
+import { PATH_BOARD } from '@/routes';
+import { PageHeader, ProfileTable } from '@/components';
 
 const items = [
   { title: 'Cenadi', href: PATH_BOARD.cenadi },
@@ -43,13 +38,13 @@ function Page() {
   return (
     <>
       <>
-        <title>Habilitations | SYRAP</title>
+        <title>Rôles | SYRAP</title>
         <meta name="description" content="" />
       </>
       <Container fluid>
         <Stack gap="lg">
-          <PageHeader title="Habilitations" breadcrumbItems={items} />
-          <AuthorizationsTable />
+          <PageHeader title="Rôles" breadcrumbItems={items} />
+          <ProfileTable />
         </Stack>
       </Container>
     </>

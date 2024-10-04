@@ -37,8 +37,8 @@ import ErrorAlert from '@/components/ErrorAlert';
 import UsersForm from '@/components/Forms/UsersForm/UsersForm';
 
 import UniversitiesTable from '@/components/UniversitiesTable/UniversitiesTable';
-import IpesTable from '@/components/IpesTable/IpesTable';
-import UsersTable from '@/components/UsersTable/UsersTable';
+import IpesTable_old from '@/components/IpesTable/IpesTable_old';
+import UsersTable from '@/components/UsersTable/UserTable';
 import BranchTable from '@/components/BranchTable/BranchTable';
 import LevelTable from '@/components/LevelTable/LevelTable';
 import SyllabusTable from '@/components/SyllabusTable/Syllabus';
@@ -48,6 +48,7 @@ import IpesDetailsCard from '@/components/IpesDetailsCard/IpesDetailsCard';
 import SyllabusITable from '@/components/SyllabusITable/SyllabusI';
 import DocumentsTable from '@/components/DocumentsTable/DocumentsTable';
 import AuthorizationsTable from '@/components/AuthorizationsTable/AuthorizationsTable';
+import ProfileTable from '@/components/ProfileTable/ProfileTable';
 import Syllabus from '@/components/SyllabusUTable/Syllabus';
 import BranchesUniversityTable from '@/components/UniversitiesTable/BranchTable/BranchTable';
 import LevelsUniversityTable from '@/components/UniversitiesTable/LevelTable/LevelTable';
@@ -91,7 +92,7 @@ export {
   ErrorAlert,
   UsersForm,
   UniversitiesTable,
-  IpesTable,
+  IpesTable_old,
   UsersTable,
   BranchTable,
   LevelTable,
@@ -105,4 +106,5 @@ export {
   Syllabus,
   BranchesUniversityTable,
   LevelsUniversityTable,
+  ProfileTable,
 };

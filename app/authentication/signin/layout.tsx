@@ -44,14 +44,16 @@ function SignInLayout({ children }: AuthProps) {
           style={{
             width: '100%', // Ensure the stack takes full width
             height: '100vh', // Takes full viewport height
-            backgroundColor: colorScheme === 'dark' ? '#fff' : '#000', // Set background color to black
+            // backgroundColor: colorScheme === 'dark' ? '#fff' : '#000', // Set background color to black
+            backgroundColor: '#ffeccc',
           }}
         >
           <Image
             src={
-              colorScheme === 'dark'
-                ? '/thumbnail-cmr-l.jpg'
-                : '/thumbnail-cmr.jpg'
+              // colorScheme === 'dark'
+              //   ? '/thumbnail-cmr-l.jpg'
+              //   : '/thumbnail-cmr.jpg'
+              '/thumbnail.png'
             } // Replace with your image path or URL
             alt="Your description"
             width={650} // Set image width

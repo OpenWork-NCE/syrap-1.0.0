@@ -26,6 +26,7 @@ import {
   Tooltip,
 } from '@mantine/core';
 import {
+  IconCheck,
   IconDownload,
   IconEdit,
   IconFileTypeCsv,
@@ -47,6 +48,7 @@ import { modals } from '@mantine/modals';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { download, generateCsv, mkConfig } from 'export-to-csv';
+import { notifications } from '@mantine/notifications';
 
 const csvConfig = mkConfig({
   fieldSeparator: ',',
@@ -161,7 +163,7 @@ const Section = () => {
         },
       },
     ],
-    [],
+    [validationErrors],
   );
 
   //Manage MRT state that we want to pass to our API
@@ -221,6 +223,7 @@ const Section = () => {
   const handleSaveBranch: MRT_TableOptions<Branch>['onEditingRowSave'] =
     async ({ values, table, row }) => {
       const newValidationErrors = validateBranch(values);
+      console.log('Voici les valeurs : ', values, " et l'id : ", row.id);
       if (Object.values(newValidationErrors).some((error) => error)) {
         setValidationErrors(newValidationErrors);
         return;
@@ -248,8 +251,8 @@ const Section = () => {
   const table = useMantineReactTable({
     columns,
     data: fetchedBranchs,
-    createDisplayMode: 'modal', //default ('row', and 'custom' are also available)
-    editDisplayMode: 'modal', //default ('row', 'cell', 'table', and 'custom' are also available)
+    createDisplayMode: 'row', //default ('row', and 'custom' are also available)
+    editDisplayMode: 'row', //default ('row', 'cell', 'table', and 'custom' are also available)
     enableEditing: true,
     enableRowSelection: true,
     positionToolbarAlertBanner: 'bottom',
@@ -295,7 +298,7 @@ const Section = () => {
       : undefined,
     mantineTableContainerProps: {
       style: {
-        minHeight: '500px',
+        minHeight: 'auto',
       },
     },
     onCreatingRowCancel: () => setValidationErrors({}),
@@ -529,6 +532,14 @@ function useCreateBranch() {
         throw new Error('Erreur lors de la création de la filière');
       }
 
+      notifications.show({
+        color: 'teal',
+        title: 'Permission créee',
+        message: 'Merci de votre patience',
+        icon: <IconCheck />,
+        loading: false,
+        autoClose: 2000,
+      });
       // Retourner la réponse du serveur (optionnel)
       return await response.json();
     },
@@ -574,6 +585,14 @@ function useUpdateBranch() {
         throw new Error('Erreur lors de la mise à jour de la filière');
       }
 
+      notifications.show({
+        color: 'green',
+        title: 'Permission mise à jour',
+        message: 'Merci de votre patience',
+        icon: <IconCheck />,
+        loading: false,
+        autoClose: 2000,
+      });
       // Retourner la réponse du serveur (optionnel)
       return await response.json();
     },
@@ -617,6 +636,14 @@ function useDeleteBranch() {
         throw new Error('Erreur lors de la suppression de la filière');
       }
 
+      notifications.show({
+        color: 'red',
+        title: 'Permission supprimée',
+        message: 'Merci de votre patience',
+        icon: <IconCheck />,
+        loading: false,
+        autoClose: 2000,
+      });
       // Retourner une confirmation (optionnel)
       return await response.json();
     },
@@ -670,6 +697,7 @@ const validateNumberRequired = (value: number) => !!value;
 
 function validateBranch(branch: Branch) {
   return {
+    // id: !validateNumberRequired(Number(branch.id)),
     name: !validateRequired(branch.name)
       ? "L'intitulé de la filière est requise"
       : '',

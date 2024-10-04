@@ -29,6 +29,7 @@ import {
   Menu,
 } from '@mantine/core';
 import {
+  IconCheck,
   IconDownload,
   IconEdit,
   IconFileTypeCsv,
@@ -50,6 +51,7 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { download, generateCsv, mkConfig } from 'export-to-csv';
 import { modals, ModalsProvider } from '@mantine/modals';
+import { notifications } from '@mantine/notifications';
 
 const csvConfig = mkConfig({
   fieldSeparator: ',',
@@ -529,6 +531,14 @@ function useCreateUe() {
         throw new Error("Erreur lors de la création de l'UE");
       }
 
+      notifications.show({
+        color: 'teal',
+        title: 'Permission créee',
+        message: 'Merci de votre patience',
+        icon: <IconCheck />,
+        loading: false,
+        autoClose: 2000,
+      });
       // Retourner la réponse du serveur (optionnel)
       return await response.json();
     },
@@ -573,6 +583,14 @@ function useUpdateUe() {
         throw new Error('Erreur lors de la mise à jour de lùue');
       }
 
+      notifications.show({
+        color: 'green',
+        title: 'Permission mise à jour',
+        message: 'Merci de votre patience',
+        icon: <IconCheck />,
+        loading: false,
+        autoClose: 2000,
+      });
       // Retourner la réponse du serveur (optionnel)
       return await response.json();
     },
@@ -614,6 +632,14 @@ function useDeleteUe() {
         throw new Error('Erreur lors de la suppression du niveau');
       }
 
+      notifications.show({
+        color: 'red',
+        title: 'Permission supprimée',
+        message: 'Merci de votre patience',
+        icon: <IconCheck />,
+        loading: false,
+        autoClose: 2000,
+      });
       // Retourner une confirmation (optionnel)
       return await response.json();
     },

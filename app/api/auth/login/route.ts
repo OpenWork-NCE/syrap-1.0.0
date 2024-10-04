@@ -8,15 +8,18 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
   try {
-    const response = await fetchJson<IAccessToken>(backendUrl(`/login`), {
-      method: 'POST',
-      body: await request.text(),
-      headers: {
-        'Content-Type': 'application/json',
-        'x-user-ip': getClientIp(request),
-        'x-user-agent': request.headers.get('user-agent')!,
+    const response = await fetchJson<IAccessToken>(
+      backendUrl(`/api/auth/login`),
+      {
+        method: 'POST',
+        body: await request.text(),
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-ip': getClientIp(request),
+          'x-user-agent': request.headers.get('user-agent')!,
+        },
       },
-    });
+    );
 
     // delete callback cookie
     cookies().delete(process.env.USER_AUTH_CALLBACK_URL_COOKIE_KEY!);

@@ -16,6 +16,9 @@ import {
   IconUsersGroup,
   IconX,
   IconFile,
+  IconFridge,
+  IconUserCheck,
+  IconAffiliate,
 } from '@tabler/icons-react';
 import { Logo, UserProfileButton } from '@/components';
 import { PATH_APPS, PATH_SECTIONS, PATH_BOARD } from '@/routes';
@@ -30,6 +33,11 @@ const mockdata = [
     links: [
       { label: 'Accueil', icon: IconChartBar, link: PATH_BOARD.cenadi },
       { label: 'UEs', icon: IconFolders, link: PATH_SECTIONS.ues },
+      {
+        label: 'Filières et Niveaux',
+        icon: IconFridge,
+        link: PATH_SECTIONS.branchNlevel,
+      },
       {
         label: 'Universités de Tutelle',
         icon: IconSchool,
@@ -100,8 +108,13 @@ const mockdata = [
         link: PATH_SECTIONS.users,
       },
       {
-        label: 'Habilitations',
-        icon: IconUsersGroup,
+        label: 'Rôles',
+        icon: IconUserCheck,
+        link: PATH_SECTIONS.profiles,
+      },
+      {
+        label: 'Permissions',
+        icon: IconAffiliate,
         link: PATH_SECTIONS.authorizations,
       },
     ],
@@ -112,12 +125,12 @@ const mockdata = [
       {
         label: 'Rapports',
         icon: IconFolderShare,
-        link: PATH_APPS.profile,
+        link: PATH_SECTIONS.reports,
       },
       {
         label: 'Logs',
         icon: IconChartArea,
-        link: PATH_APPS.settings,
+        link: PATH_SECTIONS.logs,
       },
     ],
   },

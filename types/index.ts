@@ -26,6 +26,14 @@ export type Orders = {
   payment_method: string;
 };
 
+export type Arrondissements = {
+  id: string;
+  name: string;
+  slug: string;
+  created_at: string;
+  updated_at: string;
+};
+
 export type InvoiceStatus =
   | 'pending'
   | 'sent'
