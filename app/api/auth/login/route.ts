@@ -1,18 +1,32 @@
-import { backendUrl, fetchJson, getClientIp } from '@/app/lib/utils';
+import {
+  backendUrl,
+  fetchJson,
+  getClientIp,
+  requestJsonBody,
+} from '@/app/lib/utils';
 import IAccessToken from '@/interfaces/IAccessToken';
 import { cookies } from 'next/headers';
 import moment from 'moment';
 import { serializeError } from 'serialize-error';
+import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';
 
+const loginSchema = z.object({
+  email: z
+    .string({ required_error: 'Votre adresse e-mail est nécessaire' })
+    .email('Une addresse corriel valide est requise'),
+  password: z.string({ required_error: 'Le mot de passe est requis' }),
+});
+
 export async function POST(request: Request) {
   try {
+    const bodyPayload = loginSchema.parse(await requestJsonBody(request));
     const response = await fetchJson<IAccessToken>(
       backendUrl(`/api/auth/login`),
       {
         method: 'POST',
-        body: await request.text(),
+        body: JSON.stringify(bodyPayload),
         headers: {
           'Content-Type': 'application/json',
           'x-user-ip': getClientIp(request),

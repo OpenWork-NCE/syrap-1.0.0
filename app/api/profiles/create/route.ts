@@ -14,17 +14,26 @@ const createSchema = z.object({
     .string({ required_error: "L'intitulé du rôle est requis." })
     .min(3, 'Plus de trois caractères')
     .max(100, 'Moins de 100 caractères.'),
+  Permissions: z.array(z.string()).optional(),
 });
 
 export async function POST(request: Request) {
   // return adminMiddleware(req, async (user) => {
   try {
     const bodyPayload = createSchema.parse(await requestJsonBody(request));
-    const branch = await fetchJson<any>(
+    const parsedPermissions = bodyPayload.Permissions?.map((permission) =>
+      Number(permission),
+    );
+    const body = JSON.stringify({
+      name: bodyPayload.name,
+      permissions: parsedPermissions,
+    });
+    console.log('Voici le format de retour du body : ', body);
+    const profile = await fetchJson<any>(
       backendUrl(`/api/authorisations/roles`),
       {
         method: 'POST',
-        body: JSON.stringify(bodyPayload),
+        body,
         headers: {
           'Content-Type': 'application/json',
           'x-user-ip': getClientIp(request),
@@ -33,7 +42,7 @@ export async function POST(request: Request) {
         },
       },
     );
-    return new Response(JSON.stringify(branch));
+    return new Response(JSON.stringify(profile));
   } catch (error) {
     return new Response(JSON.stringify(serializeError(error)), { status: 500 });
   }

@@ -20,16 +20,19 @@ export async function POST(request: Request) {
   // return adminMiddleware(req, async (user) => {
   try {
     const bodyPayload = createSchema.parse(await requestJsonBody(request));
-    const branch = await fetchJson<any>(backendUrl(`/api/institutes/niveaux`), {
-      method: 'POST',
-      body: JSON.stringify(bodyPayload),
-      headers: {
-        'Content-Type': 'application/json',
-        'x-user-ip': getClientIp(request),
-        'x-user-agent': request.headers.get('user-agent')!,
-        'x-user-auth': request.headers.get('x-auto-auth') ?? 'false',
+    const branch = await fetchJson<any>(
+      backendUrl(`/api/address/arrondissements`),
+      {
+        method: 'POST',
+        body: JSON.stringify(bodyPayload),
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-ip': getClientIp(request),
+          'x-user-agent': request.headers.get('user-agent')!,
+          'x-user-auth': request.headers.get('x-auto-auth') ?? 'false',
+        },
       },
-    });
+    );
     return new Response(JSON.stringify(branch));
   } catch (error) {
     return new Response(JSON.stringify(serializeError(error)), { status: 500 });

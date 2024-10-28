@@ -1,18 +1,8 @@
 'use client';
 
-import {
-  ActionIcon,
-  Anchor,
-  Container,
-  Grid,
-  Group,
-  Paper,
-  PaperProps,
-  Stack,
-  Text,
-} from '@mantine/core';
+import { Anchor, Container, Stack } from '@mantine/core';
 import { PATH_BOARD } from '@/routes';
-import { BranchTable, LevelTable, PageHeader, UesTable } from '@/components';
+import { PageHeader, UesTable } from '@/components';
 
 const items = [
   { title: 'Cenadi', href: PATH_BOARD.cenadi },

@@ -40,15 +40,22 @@ const createSchema = z.object({
       /[\W_]/,
       'Le mot de passe doit contenir au moins un caractère spécial (ex. @, !, #, etc.)',
     ),
+  Roles: z.array(z.string()).optional(),
 });
 
 export async function POST(request: Request) {
   // return adminMiddleware(req, async (user) => {
   try {
     const bodyPayload = createSchema.parse(await requestJsonBody(request));
+    const parsedRoles = bodyPayload.Roles?.map((roles) => Number(roles));
+    const body = JSON.stringify({
+      name: bodyPayload.name,
+      permissions: parsedRoles,
+    });
+    console.log('Voici le format de retour du body : ', body);
     const branch = await fetchJson<any>(backendUrl(`/api/users`), {
       method: 'POST',
-      body: JSON.stringify(bodyPayload),
+      body,
       headers: {
         'Content-Type': 'application/json',
         'x-user-ip': getClientIp(request),

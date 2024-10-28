@@ -391,20 +391,20 @@ const Section = () => {
               <IconRefresh />
             </ActionIcon>
           </Tooltip>
-          <Button
-            onClick={() => {
-              table.setCreatingRow(true); //simplest way to open the create row modal with no default values
-              //or you can pass in a row object to set default values with the `createRow` helper function
-              // table.setCreatingRow(
-              //   createRow(table, {
-              //     //optionally pass in default values for the new row, useful for nested data or other complex scenarios
-              //   }),
-              // );
-            }}
-            leftSection={<IconPlus />}
-          >
-            Nouvelle permission
-          </Button>
+          {/*<Button*/}
+          {/*  onClick={() => {*/}
+          {/*    table.setCreatingRow(true); //simplest way to open the create row modal with no default values*/}
+          {/*    //or you can pass in a row object to set default values with the `createRow` helper function*/}
+          {/*    // table.setCreatingRow(*/}
+          {/*    //   createRow(table, {*/}
+          {/*    //     //optionally pass in default values for the new row, useful for nested data or other complex scenarios*/}
+          {/*    //   }),*/}
+          {/*    // );*/}
+          {/*  }}*/}
+          {/*  leftSection={<IconPlus />}*/}
+          {/*>*/}
+          {/*  Nouvelle permission*/}
+          {/*</Button>*/}
           <Menu
             shadow={'md'}
             // width={130}
@@ -728,8 +728,6 @@ const validateRequired = (value: string) =>
   !!value.length && value.length > 3 && value.length <= 100;
 function validateAuthorizations(authorization: Authorizations) {
   return {
-    name: !validateRequired(authorization.name)
-      ? 'Ce champs doit contenir entre 3 et 100 caractères.'
-      : '',
+    name: !validateRequired(authorization.name) ? 'Ce champs est requis' : '',
   };
 }

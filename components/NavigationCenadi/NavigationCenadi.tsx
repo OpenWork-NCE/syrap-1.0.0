@@ -19,6 +19,8 @@ import {
   IconFridge,
   IconUserCheck,
   IconAffiliate,
+  IconHomeEdit,
+  IconHomeCog,
 } from '@tabler/icons-react';
 import { Logo, UserProfileButton } from '@/components';
 import { PATH_APPS, PATH_SECTIONS, PATH_BOARD } from '@/routes';
@@ -116,6 +118,21 @@ const mockdata = [
         label: 'Permissions',
         icon: IconAffiliate,
         link: PATH_SECTIONS.authorizations,
+      },
+    ],
+  },
+  {
+    title: 'Institutions',
+    links: [
+      {
+        label: 'Cenadi',
+        icon: IconHomeEdit,
+        link: PATH_SECTIONS.cenadis,
+      },
+      {
+        label: 'Minesup',
+        icon: IconHomeCog,
+        link: PATH_SECTIONS.minesups,
       },
     ],
   },

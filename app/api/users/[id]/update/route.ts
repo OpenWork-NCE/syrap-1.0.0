@@ -40,6 +40,7 @@ const createSchema = z.object({
       /[\W_]/,
       'Le mot de passe doit contenir au moins un caractère spécial (ex. @, !, #, etc.)',
     ),
+  Roles: z.array(z.string()).optional(),
 });
 
 export async function PUT(
@@ -49,9 +50,15 @@ export async function PUT(
   // return adminMiddleware(req, async (user) => {
   try {
     const bodyPayload = createSchema.parse(await requestJsonBody(request));
-    const branch = await fetchJson<any>(backendUrl(`/api/users/${id}`), {
+    const parsedRoles = bodyPayload.Roles?.map((roles) => Number(roles));
+    const body = JSON.stringify({
+      name: bodyPayload.name,
+      permissions: parsedRoles,
+    });
+    console.log('Voici le format de retour du body : ', body);
+    const user = await fetchJson<any>(backendUrl(`/api/users/${id}`), {
       method: 'PUT',
-      body: JSON.stringify(bodyPayload),
+      body,
       headers: {
         'Content-Type': 'application/json',
         'x-user-ip': getClientIp(request),
@@ -59,7 +66,7 @@ export async function PUT(
         'x-user-auth': request.headers.get('x-auto-auth') ?? 'false',
       },
     });
-    return new Response(JSON.stringify(branch));
+    return new Response(JSON.stringify(user));
   } catch (error) {
     return new Response(JSON.stringify(serializeError(error)), { status: 500 });
   }

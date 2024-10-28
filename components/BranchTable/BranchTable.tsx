@@ -59,6 +59,11 @@ const csvConfig = mkConfig({
 type Branch = {
   id: string;
   name: string;
+  description: string;
+  validate?: string;
+  author?: {
+    user_id: string;
+  };
 };
 
 type BranchApiResponse = {
@@ -116,26 +121,88 @@ const Section = () => {
   >({});
 
   const handleExportRows = (rows: MRT_Row<Branch>[]) => {
-    const doc = new jsPDF();
+    const doc = new jsPDF('portrait', 'pt', 'A4');
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const logoUrl = '/thumbnail.png'; // Path to your logo
+
+    // French Column (Left)
+    const frenchText = `
+      REPUBLIQUE DU CAMEROUN
+             Paix – Travail – Patrie
+              -------------------------
+        MINISTERE DES FINANCES
+              -------------------------
+         SECRETARIAT GENERAL
+              ------------------------
+          CENTRE NATIONAL DE
+           DEVELOPPEMENT DE
+               L’INFORMATIQUE
+               -------------------------
+    `;
+
+    // English Column (Right)
+    const englishText = `
+          REPUBLIC OF CAMEROON
+           Peace – Work – Fatherland
+                  -------------------------
+             MINISTRY OF FINANCE
+                  -------------------------
+            GENERAL SECRETARIAT
+                  -------------------------
+          NATIONAL CENTRE FOR THE
+        DEVELOPMENT OF COMPUTER
+                           SERVICES
+              ------------------------------------
+    `;
+
+    // Add Header with 3 columns
+    doc.setFontSize(10);
+
+    // Column 1: French text
+    doc.text(frenchText, 40, 50); // Positioned on the left side
+
+    // Column 2: Logo
+    doc.addImage(logoUrl, 'PNG', pageWidth / 2 - 30, 40, 60, 60); // Centered logo
+
+    // Column 3: English text
+    doc.text(englishText, pageWidth - 250, 50); // Positioned on the right side
+
+    // Draw a line separating the header from the rest of the content
+    // doc.setLineWidth(0.5);
+    // doc.line(30, 170, pageWidth - 30, 170); // Line under the header
+
+    // doc.setLineWidth(0.5);
+    // doc.line(30, 60, 180, 60); // Draw a line under the header
+
+    // doc.text();
     const tableData = rows.map((row) => Object.values(row.original));
     const tableHeaders = columns.map((c) => c.header);
 
+    // Add table using autoTable
     autoTable(doc, {
+      startY: 200, // Start after the header
       head: [tableHeaders],
-      body: tableData,
+      body: rows.map((row) => [row.original.name, row.original.description]),
     });
 
     doc.save('syrap-filières.pdf');
   };
 
   const handleExportRowsAsCSV = (rows: MRT_Row<Branch>[]) => {
-    const rowData = rows.map((row) => row.original);
+    const rowData = rows.map((row) => ({
+      name: row.original.name,
+      description: row.original.description,
+    }));
     const csv = generateCsv(csvConfig)(rowData);
     download(csvConfig)(csv);
   };
 
   const handleExportDataAsCSV = () => {
-    const csv = generateCsv(csvConfig)(fetchedBranchs);
+    const allData = fetchedBranchs.map((row) => ({
+      name: row.name,
+      description: row.description,
+    }));
+    const csv = generateCsv(csvConfig)(allData);
     download(csvConfig)(csv);
   };
 
@@ -229,7 +296,11 @@ const Section = () => {
         return;
       }
       setValidationErrors({});
-      await updateBranch({ id: row.id, name: values.name });
+      await updateBranch({
+        id: row.id,
+        name: values.name,
+        description: values.name,
+      });
       table.setEditingRow(null); //exit editing mode
     };
 

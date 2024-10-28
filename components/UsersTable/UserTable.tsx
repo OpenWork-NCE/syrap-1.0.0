@@ -59,11 +59,23 @@ const csvConfig = mkConfig({
   useKeysAsHeaders: true,
 });
 
+type Profile = {
+  id: string;
+  name: string;
+};
+
+type ProfileApiResponse = {
+  data: Array<Profile>;
+  messages: Array<string>;
+  success: string;
+};
+
 type User = {
   id: string;
   name: string;
   email: string;
   password?: string;
+  roles?: Profile[];
 };
 
 type UserApiResponse = {
@@ -117,32 +129,120 @@ const useGetUsers = ({
   });
 };
 
+const useGetProfiles = () => {
+  //build the URL (https://www.mantine-react-table.com/api/data?start=0&size=10&filters=[]&globalFilter=&sorting=[])
+  const fetchURL = new URL(
+    '/api/profiles',
+    process.env.NODE_ENV === 'production'
+      ? 'https://www.mantine-react-table.com'
+      : 'http://localhost:3000',
+  );
+
+  return useQuery<ProfileApiResponse>({
+    // queryKey: ['profile', fetchURL.href], //refetch whenever the URL changes (columnFilters, globalFilter, sorting, pagination)
+    queryKey: ['profiles'], //refetch whenever the URL changes (columnFilters, globalFilter, sorting, pagination)
+    queryFn: () => fetch(fetchURL.href).then((res) => res.json()),
+    placeholderData: keepPreviousData, //useful for paginated queries by keeping data from previous pages on screen while fetching the next page
+    staleTime: 30_000, //don't refetch previously viewed pages until cache is more than 30 seconds old
+  });
+};
+
 const Section = () => {
   const [validationErrors, setValidationErrors] = useState<
     Record<string, string | undefined>
   >({});
 
+  const {
+    data: lData,
+    isError: lIsError,
+    isFetching: lIsFetching,
+    isLoading: lIsLoading,
+    refetch: lRefresh,
+  } = useGetProfiles();
+
+  const fetchedProfiles = lData?.data ?? [];
+  console.log('Intelligence de jeu : ', fetchedProfiles);
+
   const handleExportRows = (rows: MRT_Row<User>[]) => {
-    const doc = new jsPDF();
+    const doc = new jsPDF('portrait', 'pt', 'A4');
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const logoUrl = '/thumbnail.png'; // Path to your logo
+
+    // French Column (Left)
+    const frenchText = `
+      REPUBLIQUE DU CAMEROUN
+             Paix – Travail – Patrie
+              -------------------------
+        MINISTERE DES FINANCES
+              -------------------------
+         SECRETARIAT GENERAL
+              ------------------------
+          CENTRE NATIONAL DE
+           DEVELOPPEMENT DE
+               L’INFORMATIQUE
+               -------------------------
+    `;
+
+    // English Column (Right)
+    const englishText = `
+          REPUBLIC OF CAMEROON
+           Peace – Work – Fatherland
+                  -------------------------
+             MINISTRY OF FINANCE
+                  -------------------------
+            GENERAL SECRETARIAT
+                  -------------------------
+          NATIONAL CENTRE FOR THE
+        DEVELOPMENT OF COMPUTER
+                           SERVICES
+              ------------------------------------
+    `;
+
+    // Add Header with 3 columns
+    doc.setFontSize(10);
+
+    // Column 1: French text
+    doc.text(frenchText, 40, 50); // Positioned on the left side
+
+    // Column 2: Logo
+    doc.addImage(logoUrl, 'PNG', pageWidth / 2 - 30, 40, 60, 60); // Centered logo
+
+    // Column 3: English text
+    doc.text(englishText, pageWidth - 250, 50); // Positioned on the right side
+
+    // Draw a line separating the header from the rest of the content
+    // doc.setLineWidth(0.5);
+    // doc.line(30, 170, pageWidth - 30, 170); // Line under the header
+
+    // doc.setLineWidth(0.5);
+    // doc.line(30, 60, 180, 60); // Draw a line under the header
+
+    // doc.text();
     const tableData = rows.map((row) => Object.values(row.original));
     const tableHeaders = columns.map((c) => c.header);
 
     autoTable(doc, {
+      startY: 200, // Start after the header
       head: [tableHeaders],
-      body: tableData,
+      body: [['name', 'roles']],
     });
 
     doc.save('syrap-users.pdf');
   };
 
   const handleExportRowsAsCSV = (rows: MRT_Row<User>[]) => {
-    const rowData = rows.map((row) => row.original);
+    const rowData = rows.map((row) => ({
+      name: row.original.name,
+    }));
     const csv = generateCsv(csvConfig)(rowData);
     download(csvConfig)(csv);
   };
 
   const handleExportDataAsCSV = () => {
-    const csv = generateCsv(csvConfig)(fetchedUsers);
+    const allData = fetchedUsers.map((row) => ({
+      name: row.name,
+    }));
+    const csv = generateCsv(csvConfig)(allData);
     download(csvConfig)(csv);
   };
 
@@ -183,6 +283,17 @@ const Section = () => {
               email: undefined,
             }),
           //optionally add validation checking for onBlur or onChange
+        },
+      },
+      {
+        accessorFn: (row) => row.roles?.join(', '),
+        header: 'Roles',
+        editVariant: 'multi-select',
+        mantineEditSelectProps: {
+          data: fetchedProfiles.map((profile) => ({
+            value: String(profile.id),
+            label: profile.name,
+          })),
         },
       },
       {
@@ -255,7 +366,7 @@ const Section = () => {
       setValidationErrors(newValidationErrors);
       return;
     }
-    setValidationErrors({});
+    setValidationErrors(values);
     await createUser(values);
     exitCreatingMode();
   };
@@ -271,10 +382,10 @@ const Section = () => {
       setValidationErrors(newValidationErrors);
       return;
     }
-    setValidationErrors({});
+    setValidationErrors(values);
     await updateUser({
       ...values,
-      id: row.id,
+      id: row.original.id,
     });
     table.setEditingRow(null); //exit editing mode
   };

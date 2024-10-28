@@ -56,6 +56,7 @@ import { download, generateCsv, mkConfig } from 'export-to-csv';
 import { modals, ModalsProvider } from '@mantine/modals';
 import { PATH_SECTIONS } from '@/routes';
 import { useRouter } from 'next/navigation';
+import { useTheme, useUniversities } from '@/app/lib/store';
 
 const csvConfig = mkConfig({
   fieldSeparator: ',',
@@ -66,11 +67,11 @@ const csvConfig = mkConfig({
 type University = {
   id: string;
   name: string;
-  code?: string;
-  description?: string;
-  phone?: string;
-  email?: string;
-  arrondissement_id: string;
+  code: string;
+  phone: string;
+  description: string;
+  email: string;
+  arrondissement_id: number;
   user_id?: string;
   cenadi_id?: string;
 };
@@ -170,26 +171,93 @@ const Section = () => {
   const fetchedLocalizations = lData?.data ?? [];
 
   const handleExportRows = (rows: MRT_Row<University>[]) => {
-    const doc = new jsPDF();
+    const doc = new jsPDF('portrait', 'pt', 'A4');
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const logoUrl = '/thumbnail.png'; // Path to your logo
+
+    // French Column (Left)
+    const frenchText = `
+      REPUBLIQUE DU CAMEROUN
+             Paix – Travail – Patrie
+              -------------------------
+        MINISTERE DES FINANCES
+              -------------------------
+         SECRETARIAT GENERAL
+              ------------------------
+          CENTRE NATIONAL DE
+           DEVELOPPEMENT DE
+               L’INFORMATIQUE
+               -------------------------
+    `;
+
+    // English Column (Right)
+    const englishText = `
+          REPUBLIC OF CAMEROON
+           Peace – Work – Fatherland
+                  -------------------------
+             MINISTRY OF FINANCE
+                  -------------------------
+            GENERAL SECRETARIAT
+                  -------------------------
+          NATIONAL CENTRE FOR THE
+        DEVELOPMENT OF COMPUTER
+                           SERVICES
+              ------------------------------------
+    `;
+
+    // Add Header with 3 columns
+    doc.setFontSize(10);
+
+    // Column 1: French text
+    doc.text(frenchText, 40, 50); // Positioned on the left side
+
+    // Column 2: Logo
+    doc.addImage(logoUrl, 'PNG', pageWidth / 2 - 30, 40, 60, 60); // Centered logo
+
+    // Column 3: English text
+    doc.text(englishText, pageWidth - 250, 50); // Positioned on the right side
+
+    // Draw a line separating the header from the rest of the content
+    // doc.setLineWidth(0.5);
+    // doc.line(30, 170, pageWidth - 30, 170); // Line under the header
+
+    // doc.setLineWidth(0.5);
+    // doc.line(30, 60, 180, 60); // Draw a line under the header
+
+    // doc.text();
     const tableData = rows.map((row) => Object.values(row.original));
     const tableHeaders = columns.map((c) => c.header);
 
     autoTable(doc, {
+      startY: 200, // Start after the header
       head: [tableHeaders],
-      body: tableData,
+      body: [['code', 'name', 'description', 'phone', 'email']],
     });
 
-    doc.save('syrap-universities.pdf');
+    doc.save('syrap-filières.pdf');
   };
 
   const handleExportRowsAsCSV = (rows: MRT_Row<University>[]) => {
-    const rowData = rows.map((row) => row.original);
+    const rowData = rows.map((row) => ({
+      code: row.original.code,
+      name: row.original.name,
+      description: row.original.description,
+      phone: row.original.phone,
+      email: row.original.email,
+    }));
     const csv = generateCsv(csvConfig)(rowData);
     download(csvConfig)(csv);
   };
 
   const handleExportDataAsCSV = () => {
-    const csv = generateCsv(csvConfig)(fetchedUniversities);
+    const allData = fetchedUniversities.map((row) => ({
+      code: row.code,
+      name: row.name,
+      description: row.description,
+      phone: row.phone,
+      email: row.email,
+    }));
+    const csv = generateCsv(csvConfig)(allData);
     download(csvConfig)(csv);
   };
 
@@ -234,12 +302,12 @@ const Section = () => {
         mantineEditTextInputProps: {
           type: 'text',
           required: true,
-          error: validationErrors?.name,
+          error: validationErrors?.description,
           //remove any previous validation errors when user focuses on the input
           onFocus: () =>
             setValidationErrors({
               ...validationErrors,
-              name: undefined,
+              description: undefined,
             }),
           //optionally add validation checking for onBlur or onChange
         },
@@ -280,63 +348,20 @@ const Section = () => {
         },
       },
       {
-        accessorKey: 'localization',
+        accessorFn: (row) =>
+          fetchedLocalizations.find(
+            (localisation) =>
+              String(localisation.id) === String(row.arrondissement_id),
+          )?.name,
         header: 'Localisation',
         editVariant: 'select',
         mantineEditSelectProps: {
           data: fetchedLocalizations.map((localization) => ({
-            value: localization.id,
+            value: String(localization.id),
             label: localization.name,
           })),
         },
-        // Cell: (props) => {
-        //   const { row, cell, table, column } = props;
-        //   const [selectedLocalization, setSelectedLocalization] = useState(
-        //     cell.getValue() as string,
-        //   );
-        //
-        //   // Find the corresponding arrondissement name based on the ID
-        //   const selectedName = fetchedLocalizations.find(
-        //     (localization) => localization.id === selectedLocalization,
-        //   )?.name;
-        //   return (
-        //     <Select
-        //       data={fetchedLocalizations.map((localization) => ({
-        //         value: localization.id,
-        //         label: localization.name,
-        //       }))}
-        //       value={selectedLocalization}
-        //       onChange={(value) => {
-        //         // Update the selected value (arrondissementId)
-        //         setSelectedLocalization(value as string);
-        //
-        //         // Optional: Handle this change to update the table row data
-        //         // Example: Update the row data in your state or pass the value to a handler
-        //       }}
-        //     />
-        //   );
-        // },
-        // mantineEditTextInputProps: {
-        //   type: 'text',
-        //   required: true,
-        //   error: validationErrors?.localization,
-        //   //remove any previous validation errors when user focuses on the input
-        //   onFocus: () =>
-        //     setValidationErrors({
-        //       ...validationErrors,
-        //       localization: undefined,
-        //     }),
-        // },
       },
-      // {
-      //   accessorKey: 'state',
-      //   header: 'State',
-      //   editVariant: 'select',
-      //   mantineEditSelectProps: {
-      //     data: usStates,
-      //     error: validationErrors?.state,
-      //   },
-      // },
     ],
     [validationErrors],
   );
@@ -370,6 +395,11 @@ const Section = () => {
   //this will depend on your API response shape
   const fetchedUniversities = data?.data ?? [];
   console.log('Voici les arrondissements : ', fetchedLocalizations);
+
+  const changeUniversities = useUniversities(
+    (state: any) => state.changeUniversities,
+  );
+  changeUniversities(fetchedUniversities);
   // const totalRowCount = data?.meta?.totalRowCount ?? 0;
 
   //call CREATE hook
@@ -391,8 +421,10 @@ const Section = () => {
         return;
       }
       setValidationErrors({});
-      console.log("VOici l'université : ", values);
-      await createUniversity(values);
+      await createUniversity({
+        ...values,
+        arrondissement_id: Number(values.arrondissement_id),
+      });
       exitCreatingMode();
     };
 
@@ -409,6 +441,7 @@ const Section = () => {
         id: row.id,
         code: values.code,
         name: values.name,
+        description: values.description,
         phone: values.phone,
         email: values.email,
         arrondissement_id: values.localization,
@@ -907,12 +940,15 @@ const validateEmail = (email: string) =>
 
 function validateUniversity(universities: University) {
   return {
-    // code: !validateRequired(universities.code)
-    //   ? "L'intitulé de l'Université est requis"
-    //   : '',
+    code: !validateRequired(universities.code)
+      ? "Le sigle de l'Université est requis"
+      : '',
     name: !validateRequired(universities.name)
       ? "L'intitulé de l'Université est requis"
       : '',
+    // description: !validateRequired(universities.description)
+    //   ? "L'intitulé de l'Université est requis"
+    //   : '',
     // phone: !validateRequired(universities.phone)
     //   ? "Le nombre d'heures est requis : "
     //   : '',

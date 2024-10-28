@@ -65,18 +65,18 @@ function Page() {
             error={statsError}
             paperProps={PAPER_PROPS}
           />
-          <Grid gutter={{ base: 5, xs: 'md', md: 'xl', xl: 50 }}>
-            <Grid.Col span={12}>
-              <Paper {...PAPER_PROPS}>
-                <Group justify="space-between" mb="md">
-                  <Text size="lg" fw={600}>
-                    Logs
-                  </Text>
-                </Group>
-                <LogTable />
-              </Paper>
-            </Grid.Col>
-          </Grid>
+          {/*<Grid gutter={{ base: 5, xs: 'md', md: 'xl', xl: 50 }}>*/}
+          {/*  <Grid.Col span={12}>*/}
+          {/*    <Paper {...PAPER_PROPS}>*/}
+          {/*      <Group justify="space-between" mb="md">*/}
+          {/*        <Text size="lg" fw={600}>*/}
+          {/*          Logs*/}
+          {/*        </Text>*/}
+          {/*      </Group>*/}
+          {/*      <LogTable />*/}
+          {/*    </Paper>*/}
+          {/*  </Grid.Col>*/}
+          {/*</Grid>*/}
         </Stack>
       </Container>
     </>

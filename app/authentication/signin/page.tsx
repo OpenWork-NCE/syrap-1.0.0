@@ -127,7 +127,7 @@ function Page() {
             href={PATH_AUTH.signup}
             {...LINK_PROPS}
           >
-            Pas encore de compte ? Contacter l'administrateur
+            Contacter l'administrateur
           </Text>
         </Center>
       </Surface>

@@ -1,8 +1,5 @@
 'use client';
 
-import '@mantine/core/styles.css';
-import '@mantine/dates/styles.css'; //if using mantine date picker features
-import 'mantine-react-table/styles.css'; //make sure MRT styles were imported in your app root (once)
 import { useMemo, useState } from 'react';
 import {
   MantineReactTable,
@@ -12,21 +9,21 @@ import {
   type MRT_PaginationState,
   type MRT_SortingState,
   type MRT_ColumnFilterFnsState,
-  MRT_Row,
-  MRT_TableOptions,
   MRT_EditActionButtons,
+  MRT_TableOptions,
+  MRT_Row,
 } from 'mantine-react-table';
 import {
   ActionIcon,
-  Tooltip,
-  Text,
-  Stack,
-  Title,
-  Flex,
   Box,
-  Divider,
   Button,
+  Divider,
+  Flex,
   Menu,
+  Stack,
+  Text,
+  Title,
+  Tooltip,
 } from '@mantine/core';
 import {
   IconCheck,
@@ -47,10 +44,10 @@ import {
   useQueryClient,
   useMutation,
 } from '@tanstack/react-query';
+import { modals } from '@mantine/modals';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { download, generateCsv, mkConfig } from 'export-to-csv';
-import { modals, ModalsProvider } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 
 const csvConfig = mkConfig({
@@ -62,12 +59,15 @@ const csvConfig = mkConfig({
 type Ue = {
   id: string;
   name: string;
+  description: string;
+  validate?: string;
+  author?: {
+    user_id: string;
+  };
 };
 
 type UeApiResponse = {
   data: Array<Ue>;
-  messages: Array<string>;
-  success: string;
 };
 
 interface Params {
@@ -107,7 +107,7 @@ const useGetUes = ({
   // fetchURL.searchParams.set('sorting', JSON.stringify(sorting ?? []));
 
   return useQuery<UeApiResponse>({
-    // queryKey: ['ue', fetchURL.href], //refetch whenever the URL changes (columnFilters, globalFilter, sorting, pagination)
+    // queryKey: ['ues', fetchURL.href], //refetch whenever the URL changes (columnFilters, globalFilter, sorting, pagination),
     queryKey: ['ues'], //refetch whenever the URL changes (columnFilters, globalFilter, sorting, pagination)
     queryFn: () => fetch(fetchURL.href).then((res) => res.json()),
     placeholderData: keepPreviousData, //useful for paginated queries by keeping data from previous pages on screen while fetching the next page
@@ -121,26 +121,88 @@ const Section = () => {
   >({});
 
   const handleExportRows = (rows: MRT_Row<Ue>[]) => {
-    const doc = new jsPDF();
+    const doc = new jsPDF('portrait', 'pt', 'A4');
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const logoUrl = '/thumbnail.png'; // Path to your logo
+
+    // French Column (Left)
+    const frenchText = `
+      REPUBLIQUE DU CAMEROUN
+             Paix – Travail – Patrie
+              -------------------------
+        MINISTERE DES FINANCES
+              -------------------------
+         SECRETARIAT GENERAL
+              ------------------------
+          CENTRE NATIONAL DE
+           DEVELOPPEMENT DE
+               L’INFORMATIQUE
+               -------------------------
+    `;
+
+    // English Column (Right)
+    const englishText = `
+          REPUBLIC OF CAMEROON
+           Peace – Work – Fatherland
+                  -------------------------
+             MINISTRY OF FINANCE
+                  -------------------------
+            GENERAL SECRETARIAT
+                  -------------------------
+          NATIONAL CENTRE FOR THE
+        DEVELOPMENT OF COMPUTER
+                           SERVICES
+              ------------------------------------
+    `;
+
+    // Add Header with 3 columns
+    doc.setFontSize(10);
+
+    // Column 1: French text
+    doc.text(frenchText, 40, 50); // Positioned on the left side
+
+    // Column 2: Logo
+    doc.addImage(logoUrl, 'PNG', pageWidth / 2 - 30, 40, 60, 60); // Centered logo
+
+    // Column 3: English text
+    doc.text(englishText, pageWidth - 250, 50); // Positioned on the right side
+
+    // Draw a line separating the header from the rest of the content
+    // doc.setLineWidth(0.5);
+    // doc.line(30, 170, pageWidth - 30, 170); // Line under the header
+
+    // doc.setLineWidth(0.5);
+    // doc.line(30, 60, 180, 60); // Draw a line under the header
+
+    // doc.text();
     const tableData = rows.map((row) => Object.values(row.original));
     const tableHeaders = columns.map((c) => c.header);
 
+    // Add table using autoTable
     autoTable(doc, {
-      head: [tableHeaders],
-      body: tableData,
+      startY: 200, // Start after the header
+      head: [['Name', 'Description']],
+      body: rows.map((row) => [row.original.name, row.original.description]),
     });
 
-    doc.save('syrap-niveaux.pdf');
+    doc.save('syrap-ues.pdf');
   };
 
   const handleExportRowsAsCSV = (rows: MRT_Row<Ue>[]) => {
-    const rowData = rows.map((row) => row.original);
+    const rowData = rows.map((row) => ({
+      name: row.original.name,
+      description: row.original.description,
+    }));
     const csv = generateCsv(csvConfig)(rowData);
     download(csvConfig)(csv);
   };
 
   const handleExportDataAsCSV = () => {
-    const csv = generateCsv(csvConfig)(fetchedUes);
+    const allData = fetchedUes.map((row) => ({
+      name: row.name,
+      description: row.description,
+    }));
+    const csv = generateCsv(csvConfig)(allData);
     download(csvConfig)(csv);
   };
 
@@ -153,7 +215,7 @@ const Section = () => {
       },
       {
         accessorKey: 'name',
-        header: 'Intitulé',
+        header: 'Nom',
         mantineEditTextInputProps: {
           type: 'text',
           required: true,
@@ -163,6 +225,22 @@ const Section = () => {
             setValidationErrors({
               ...validationErrors,
               name: undefined,
+            }),
+          //optionally add validation checking for onBlur or onChange
+        },
+      },
+      {
+        accessorKey: 'description',
+        header: 'Description',
+        mantineEditTextInputProps: {
+          type: 'text',
+          required: true,
+          error: validationErrors?.description,
+          //remove any previous validation errors when user focuses on the input
+          onFocus: () =>
+            setValidationErrors({
+              ...validationErrors,
+              description: undefined,
             }),
           //optionally add validation checking for onBlur or onChange
         },
@@ -230,6 +308,7 @@ const Section = () => {
     row,
   }) => {
     const newValidationErrors = validateUe(values);
+    console.log('Voici les valeurs : ', values, " et l'id : ", row.id);
     if (Object.values(newValidationErrors).some((error) => error)) {
       setValidationErrors(newValidationErrors);
       return;
@@ -238,6 +317,7 @@ const Section = () => {
     await updateUe({
       id: row.id,
       name: values.name,
+      description: values.description,
     });
     table.setEditingRow(null); //exit editing mode
   };
@@ -291,6 +371,7 @@ const Section = () => {
         pageSize: 10,
       },
     },
+
     mantineSearchTextInputProps: {
       placeholder: 'Rechercher des UEs',
     },
@@ -313,15 +394,9 @@ const Section = () => {
     onCreatingRowSave: handleCreateUe,
     onEditingRowCancel: () => setValidationErrors({}),
     onEditingRowSave: handleSaveUe,
-
-    onColumnFilterFnsChange: setColumnFilterFns,
-    onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
-    onPaginationChange: setPagination,
-    onSortingChange: setSorting,
     renderCreateRowModalContent: ({ table, row, internalEditComponents }) => (
       <Stack>
-        <Title order={3}>Nouveau Niveau</Title>
+        <Title order={3}>Nouvelle UE</Title>
         {internalEditComponents}
         <Flex justify="flex-end" mt="xl">
           <MRT_EditActionButtons variant="text" table={table} row={row} />
@@ -330,7 +405,7 @@ const Section = () => {
     ),
     renderEditRowModalContent: ({ table, row, internalEditComponents }) => (
       <Stack>
-        <Title order={3}>Editer le Niveau</Title>
+        <Title order={3}>Editer l'UE</Title>
         {internalEditComponents}
         <Flex justify="flex-end" mt="xl">
           <MRT_EditActionButtons variant="text" table={table} row={row} />
@@ -354,10 +429,19 @@ const Section = () => {
           <Divider pb={1} mb={10} />
           <Box style={{ fontSize: '16px' }}>
             <Text size={'sm'}>
-              Intitulé du l'unité d'enseignement :{' '}
+              Intitulé de l\'UE :{' '}
               <span style={{ fontWeight: 'bolder' }}>{row.original.name}</span>
             </Text>
             <Divider my={10} />
+            {/*<Title order={5} mb={5}>*/}
+            {/*  Niveaux de l\'UE*/}
+            {/*</Title>*/}
+            {/*<LevelTable*/}
+            {/*  datas={*/}
+            {/*    fakeDataWithLevel.find((el) => el.id === row.original.id)*/}
+            {/*      ?.levels*/}
+            {/*  }*/}
+            {/*/>*/}
           </Box>
         </Box>
       </Box>
@@ -365,6 +449,11 @@ const Section = () => {
 
     renderRowActions: ({ row, table }) => (
       <Flex gap="md">
+        {/*<Tooltip label="Details">*/}
+        {/*  <ActionIcon onClick={() => table.setEditingRow(row)}>*/}
+        {/*    <IconDetails />*/}
+        {/*  </ActionIcon>*/}
+        {/*</Tooltip>*/}
         <Tooltip label="Editer">
           <ActionIcon color={'green'} onClick={() => table.setEditingRow(row)}>
             <IconEdit />
@@ -495,17 +584,15 @@ const Section = () => {
         </Flex>
       </>
     ),
-    // onRowSelectionChange: setRowSelection,
-    // rowCount: totalRowCount,
     state: {
       columnFilterFns,
       columnFilters,
       globalFilter,
+      pagination,
       isLoading: isLoading,
       isSaving: isCreatingUe || isUpdatingUe || isDeletingUe,
       showAlertBanner: isError,
       showProgressBars: isFetching,
-      pagination,
       sorting,
     },
   });
@@ -533,7 +620,7 @@ function useCreateUe() {
 
       notifications.show({
         color: 'teal',
-        title: 'Permission créee',
+        title: "Unité d'enseignement créee",
         message: 'Merci de votre patience',
         icon: <IconCheck />,
         loading: false,
@@ -562,6 +649,7 @@ function useCreateUe() {
     },
   });
 }
+
 //UPDATE hook (put ue in api)
 function useUpdateUe() {
   const queryClient = useQueryClient();
@@ -580,12 +668,12 @@ function useUpdateUe() {
       );
 
       if (!response.ok) {
-        throw new Error('Erreur lors de la mise à jour de lùue');
+        throw new Error("Erreur lors de la mise à jour de l'UE");
       }
 
       notifications.show({
         color: 'green',
-        title: 'Permission mise à jour',
+        title: "Unité d'enseignement mise à jour",
         message: 'Merci de votre patience',
         icon: <IconCheck />,
         loading: false,
@@ -624,17 +712,17 @@ function useDeleteUe() {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ id: ueId }), // Envoyer l'ID du niveau à supprimer
+          body: JSON.stringify({ id: ueId }), // Envoyer l'ID de la uee à supprimer
         },
       );
 
       if (!response.ok) {
-        throw new Error('Erreur lors de la suppression du niveau');
+        throw new Error("Erreur lors de la suppression de l'UE");
       }
 
       notifications.show({
         color: 'red',
-        title: 'Permission supprimée',
+        title: "Unité d'enseignement supprimée",
         message: 'Merci de votre patience',
         icon: <IconCheck />,
         loading: false,
@@ -649,20 +737,20 @@ function useDeleteUe() {
       queryClient.cancelQueries({ queryKey: ['ues'] });
 
       // Sauvegarder les données actuelles dans le cache pour un rollback éventuel
-      const previousUes = queryClient.getQueryData(['ues']);
+      const previousUees = queryClient.getQueryData(['ues']);
 
       // Optimistiquement mettre à jour le cache
-      queryClient.setQueryData(['ues'], (prevUes: any | undefined) => {
-        return prevUes?.data?.filter((ue: Ue) => ue.id !== ueId);
+      queryClient.setQueryData(['ues'], (prevUees: any | undefined) => {
+        return prevUees?.data?.filter((ue: Ue) => ue.id !== ueId);
       });
 
       // Retourner un contexte de rollback au cas où on aurait besoin d'annuler cette opération
-      return { previousUes };
+      return { previousUees };
     },
     // Si la mutation échoue, restaurer les données précédentes
     onError: (err, ueId, context: any) => {
-      if (context?.previousUes) {
-        queryClient.setQueryData(['ues'], context.previousUes);
+      if (context?.previousUees) {
+        queryClient.setQueryData(['ues'], context.previousUees);
       }
     },
     // Rafraîchir les données après la suppression réussie
@@ -684,18 +772,14 @@ const UeTable = () => (
 export default UeTable;
 
 const validateRequired = (value: string) => !!value.length;
-const validateRequiredNumber = (value: number) => !!value;
-const validateEmail = (email: string) =>
-  !!email.length &&
-  email
-    .toLowerCase()
-    .match(
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-    );
+const validateNumberRequired = (value: number) => !!value;
 
 function validateUe(ue: Ue) {
   return {
-    // id: !validateRequiredNumber(Number(ue.id)) ? 'Ce champs est requis' : '',
-    name: !validateRequired(ue.name) ? 'Ce champs est requis' : '',
+    // id: !validateNumberRequired(Number(ue.id)),
+    name: !validateRequired(ue.name) ? "L'intitulé de l'UE est requise" : '',
+    // description: !validateRequired(ue.description)
+    //   ? "La description de l'UE est requise"
+    //   : '',
   };
 }

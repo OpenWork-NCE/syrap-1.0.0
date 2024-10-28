@@ -12,8 +12,8 @@ export async function GET(req: Request) {
       extractQueryParams(req);
 
     const response = await fetchJson<IPaginateResponse<any>>(
-      // backendUrl(`/api/institutes/niveaux`, queryParams),
-      'https://66e95df987e417609449251b.mockapi.io/arrrondissements',
+      backendUrl(`/api/address/arrondissements`, queryParams),
+      // 'https://66e95df987e417609449251b.mockapi.io/arrrondissements',
       {
         headers: {
           method: 'GET',

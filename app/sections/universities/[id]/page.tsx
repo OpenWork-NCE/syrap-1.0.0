@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Anchor, Container, PaperProps, Stack } from '@mantine/core';
 import { InvoiceDetailsCard, PageHeader } from '@/components';
 import { PATH_DASHBOARD, PATH_INVOICES } from '@/routes';
-import { Invoices, University } from '@/types';
-import { useFetchData } from '@/hooks';
+import { University } from '@/types/real-types';
 import UniversitiyDetailsCard from '@/components/UniversitiyDetailsCard/UniversitiyDetailsCard';
 import { fakeData } from '@/components/UniversitiesTable/makeData';
+import { useUniversities } from '@/app/lib/store';
+import Loading from '@/app/loading';
 
 const items = [
   { title: 'Cenadi', href: PATH_DASHBOARD.default },
@@ -25,36 +25,35 @@ const PAPER_PROPS: PaperProps = {
   radius: 'md',
 };
 
-function UniversityDetails({ params }: { params: { id: string } }) {
-  const [selectedData, setSelectedData] = useState<University>();
-  // const {
-  //   data: universityData,
-  //   loading: universityLoading,
-  //   error: universityError,
-  // } = useFetchData(fakeData);
-  const universityData = fakeData;
-
-  useEffect(() => {
-    setSelectedData(universityData.find((_: University) => _.id === params.id));
-  }, [universityData, params]);
+export default async function UniversityDetails({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const universities = await fetch(
+    new URL('/api/universities', 'http://localhost:3000'),
+  ).then(async (res) => {
+    return res.json();
+  });
+  const university = await universities.data.find(
+    (_: University) => Number(_.id) === Number(params.id),
+  );
 
   return (
     <>
       <>
         <title>
           Université -{' '}
-          {selectedData ? selectedData?.name : 'Université non trouvée'} | SYRAP
+          {university ? university?.name : 'Université non trouvée'} | SYRAP
         </title>
         <meta name="description" content="" />
       </>
       <Container fluid>
         <Stack gap="lg">
-          <PageHeader title={`${selectedData?.name}`} breadcrumbItems={items} />
-          <UniversitiyDetailsCard data={selectedData} {...PAPER_PROPS} />
+          <PageHeader title={`${university?.name}`} breadcrumbItems={items} />
+          <UniversitiyDetailsCard data={university} {...PAPER_PROPS} />
         </Stack>
       </Container>
     </>
   );
 }
-
-export default UniversityDetails;

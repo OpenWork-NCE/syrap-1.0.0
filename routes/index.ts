@@ -43,6 +43,8 @@ export const PATH_SECTIONS = {
       path(ROOT_SECTIONS, ROOTS_IPES + `/${id}`),
   },
   documents: path(ROOT_SECTIONS, '/documents/documents'),
+  cenadis: path(ROOT_SECTIONS, '/cenadis'),
+  minesups: path(ROOT_SECTIONS, '/minesups'),
   reports: path(ROOT_SECTIONS, '/reports'),
   logs: path(ROOT_SECTIONS, '/logs'),
 };

@@ -1,6 +1,6 @@
 'use client';
 
-import { University } from '@/types';
+import { University } from '@/types/real-types';
 import {
   Box,
   Button,
@@ -32,13 +32,9 @@ import {
   IconStack3,
 } from '@tabler/icons-react';
 import { useColorScheme, useMediaQuery } from '@mantine/hooks';
-import {
-  BranchesUniversityTable,
-  BranchTable,
-  ProfileStatsCard,
-  Surface,
-} from '@/components';
+import { BranchTable, ProfileStatsCard, Surface } from '@/components';
 import UniversityStatsCard from '@/components/UniversityStatsCard/UniversityStatsCard';
+import ClassroomsTable from '@/components/UniversitiesTable/ClassroomsTable/ClassroomsTable';
 
 const ICON_SIZE = 16;
 
@@ -103,31 +99,25 @@ const UniversityDetails = ({
               >
                 Télécharger
               </Button>
-              <Button
-                leftSection={<IconPrinter size={ICON_SIZE} />}
-                variant="light"
-              >
-                Imprimer
-              </Button>
-              <Menu shadow="md" width={200}>
-                <Menu.Target>
-                  <Button
-                    leftSection={<IconShare size={ICON_SIZE} />}
-                    variant="light"
-                  >
-                    Partager
-                  </Button>
-                </Menu.Target>
+              {/*<Menu shadow="md" width={200}>*/}
+              {/*  <Menu.Target>*/}
+              {/*    <Button*/}
+              {/*      leftSection={<IconShare size={ICON_SIZE} />}*/}
+              {/*      variant="light"*/}
+              {/*    >*/}
+              {/*      Partager*/}
+              {/*    </Button>*/}
+              {/*  </Menu.Target>*/}
 
-                <Menu.Dropdown>
-                  <Menu.Item leftSection={<IconMail size={14} />}>
-                    Via email
-                  </Menu.Item>
-                  <Menu.Item leftSection={<IconSend size={14} />} disabled>
-                    Dans un Chat
-                  </Menu.Item>
-                </Menu.Dropdown>
-              </Menu>
+              {/*  <Menu.Dropdown>*/}
+              {/*    <Menu.Item leftSection={<IconMail size={14} />}>*/}
+              {/*      Via email*/}
+              {/*    </Menu.Item>*/}
+              {/*    <Menu.Item leftSection={<IconSend size={14} />} disabled>*/}
+              {/*      Dans un Chat*/}
+              {/*    </Menu.Item>*/}
+              {/*  </Menu.Dropdown>*/}
+              {/*</Menu>*/}
             </Flex>
             <Box style={{ width: '100%' }}>
               <Box style={{ fontSize: '16px', marginBottom: '25px' }}>
@@ -151,12 +141,6 @@ const UniversityDetails = ({
                   <span style={{ fontWeight: 'bolder' }}>{data.email}</span>
                 </Text>
                 <Text {...TEXT_PROPS} size={'sm'}>
-                  Créé par :{' '}
-                  <span style={{ fontWeight: 'bolder' }}>
-                    {data.created_user}
-                  </span>
-                </Text>
-                <Text {...TEXT_PROPS} size={'sm'}>
                   Nombre d'IPES :{' '}
                   <span style={{ fontWeight: 'bolder' }}>
                     {data.ipes_count}
@@ -176,9 +160,9 @@ const UniversityDetails = ({
                 </Text>
               </Box>
               <Title order={5} mb={5}>
-                Filières de l'université
+                Salles de l'Université
               </Title>
-              <BranchesUniversityTable datas={data.branchs} />
+              <ClassroomsTable universityId={data.id} />
             </Box>
           </Stack>
         ) : (

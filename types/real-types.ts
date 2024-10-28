@@ -123,35 +123,64 @@ export type Syllabus = {
 export type Level = {
   id: string;
   name: string;
-  syllabus: Syllabus;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type LevelApiResponse = {
+  data: Array<Level>;
+  messages: Array<string>;
+  success: string;
 };
 
 export type Branch = {
   id: string;
   name: string;
-  levels: Level[];
-  createdAt: Date;
-  updatedAt: Date;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type BranchApiResponse = {
+  data: Array<Branch>;
+};
+
+export type Classroom = {
+  id: string;
+  niveau: Level;
+  filiere: Branch;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ClassroomApiResponse = {
+  data: Array<Classroom>;
+  messages: Array<string>;
+  success: string;
 };
 
 export type University = {
   //These are Cameroonian and international universities that have representations in Cameroon
   id: string;
-  acronym: string;
   name: string;
-  phone: string;
-  email: string;
-  localization: string; //Cameroon arrondissement
-  created_user: string; //Name of creator
-  ipes_count: number;
-  global_matching: number;
-  branch_count: number;
-  level_count: number;
-  branchs: Branch[];
-  createdAt: Date;
-  updatedAt: Date;
+  code: string;
+  description?: string;
+  phone?: string;
+  email?: string;
+  arrondissement_id?: number;
+  user_id?: string;
+  cenadi_id?: string;
+  ipes_count?: number;
+  global_matching?: number;
+  branch_count?: number;
+  level_count?: number;
+  salles: Classroom[];
+};
+
+export type UniversityApiResponse = {
+  data: Array<University>;
+  messages: Array<string>;
+  success: string;
 };
 
 export type Ipes = {

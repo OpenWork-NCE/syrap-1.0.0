@@ -14,7 +14,7 @@ import { createElement } from 'react';
 import ProfileStatsCard from '@/components/ProfileStatsCard/ProfileStatsCard';
 
 type UniversityStatsCardProps = {
-  amount: number;
+  amount?: number;
   title: string;
   icon: any;
   color: MantineColor;
@@ -27,9 +27,11 @@ const UniversityStatsCard = (props: UniversityStatsCardProps) => {
     <Surface component={Paper} {...others}>
       <Flex align="center" justify="space-between" mb="md">
         <Stack gap={2}>
-          <Text size="lg" fw={700} tt="capitalize">
-            <CountUp end={amount} />
-          </Text>
+          {amount && (
+            <Text size="lg" fw={700} tt="capitalize">
+              <CountUp end={amount} />
+            </Text>
+          )}
           <Text size="sm" c="dimmed" tt="capitalize">
             {title}
           </Text>

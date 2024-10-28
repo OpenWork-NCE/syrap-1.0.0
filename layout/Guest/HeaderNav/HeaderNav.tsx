@@ -14,7 +14,11 @@ import { PATH_AUTH, PATH_DASHBOARD, PATH_DOCS, PATH_GITHUB } from '@/routes';
 import { Logo } from '@/components';
 import Link from 'next/link';
 import classes from './HeaderNav.module.css';
-import { IconBrandGithub, IconLogin, IconPlayerPlay } from '@tabler/icons-react';
+import {
+  IconBrandGithub,
+  IconLogin,
+  IconPlayerPlay,
+} from '@tabler/icons-react';
 
 const HEADER_HEIGHT = rem(60);
 
@@ -29,15 +33,15 @@ const HeaderNav = () => {
       <header className={classes.header}>
         <Container className={classes.inner} fluid>
           <Logo style={{ color: theme.white }} />
-          <Group gap="xs" className={classes.links}>
-            <Button
-              component={Link}
-              href={PATH_AUTH.signin}
-              leftSection={<IconLogin size={16} />}
-            >
-              Connexion
-            </Button>
-          </Group>
+          {/*<Group gap="xs" className={classes.links}>*/}
+          {/*  <Button*/}
+          {/*    component={Link}*/}
+          {/*    href={PATH_AUTH.signin}*/}
+          {/*    leftSection={<IconLogin size={16} />}*/}
+          {/*  >*/}
+          {/*    Connexion*/}
+          {/*  </Button>*/}
+          {/*</Group>*/}
           <Burger
             opened={drawerOpened}
             onClick={toggleDrawer}

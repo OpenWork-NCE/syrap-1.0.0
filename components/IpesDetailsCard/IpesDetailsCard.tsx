@@ -32,12 +32,7 @@ import {
   IconStack3,
 } from '@tabler/icons-react';
 import { useColorScheme, useMediaQuery } from '@mantine/hooks';
-import {
-  BranchesUniversityTable,
-  BranchTable,
-  ProfileStatsCard,
-  Surface,
-} from '@/components';
+import { BranchTable, ProfileStatsCard, Surface } from '@/components';
 import IpesStatsCard from '@/components/IpesStatsCard/IpesStatsCard';
 
 const ICON_SIZE = 16;
@@ -175,7 +170,7 @@ const IpesDetails = ({ data, ...PAPER_PROPS }: IpesDetailsProps) => {
               <Title order={5} mb={5}>
                 Filières de l'Ipes
               </Title>
-              <BranchesUniversityTable datas={data.branchs} />
+              {/*<BranchesUniversityTable datas={data.branchs} />*/}
             </Box>
           </Stack>
         ) : (

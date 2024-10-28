@@ -10,7 +10,7 @@ export async function DELETE(
   // return adminMiddleware(req, async (user) => {
   try {
     const branch = await fetchJson<any>(
-      backendUrl(`/api/institutes/niveaux/${id}`),
+      backendUrl(`/api/address/arrondissements/${id}`),
       {
         method: 'DELETE',
         headers: {

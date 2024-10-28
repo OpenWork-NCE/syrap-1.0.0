@@ -50,8 +50,8 @@ import DocumentsTable from '@/components/DocumentsTable/DocumentsTable';
 import AuthorizationsTable from '@/components/AuthorizationsTable/AuthorizationsTable';
 import ProfileTable from '@/components/ProfileTable/ProfileTable';
 import Syllabus from '@/components/SyllabusUTable/Syllabus';
-import BranchesUniversityTable from '@/components/UniversitiesTable/BranchTable/BranchTable';
-import LevelsUniversityTable from '@/components/UniversitiesTable/LevelTable/LevelTable';
+import MinesupTable from '@/components/MinesupTable/MinesupTable';
+import CenadiTable from '@/components/CenadiTable/CenadiTable';
 
 export {
   Logo,
@@ -104,7 +104,7 @@ export {
   DocumentsTable,
   AuthorizationsTable,
   Syllabus,
-  BranchesUniversityTable,
-  LevelsUniversityTable,
   ProfileTable,
+  MinesupTable,
+  CenadiTable,
 };
